@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on 操作系统开发</title>
+    <link>https://os-dev.incolore.net/posts/</link>
+    <description>Recent content in Posts on 操作系统开发</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 23 Jan 2021 08:37:54 +0800</lastBuildDate><atom:link href="https://os-dev.incolore.net/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Windows 基础操作</title>
+      <link>https://os-dev.incolore.net/posts/windows-%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C/</link>
+      <pubDate>Sat, 23 Jan 2021 08:37:54 +0800</pubDate>
+      
+      <guid>https://os-dev.incolore.net/posts/windows-%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C/</guid>
+      <description>Windows（Win）键在哪里 如何打开 PowerShell 窗口（管理员权限） 按下 Win+X 键。
+点击 Windows PowerShell（管理员） 菜单项，即可打开 PowerShell。
+如何打开 cmd 窗口（普通权限和管理员权限） 如果只需要普通权限，按下 Win+R，输入 cmd：
+然后回车（或点击 确定 ）即可：
+如果需要管理员权限，可打开 PowerShell 窗口（管理员权限），然后执行 cmd 命令：
+执行 exit 命令可退出。</description>
+    </item>
+    
+  </channel>
+</rss>
