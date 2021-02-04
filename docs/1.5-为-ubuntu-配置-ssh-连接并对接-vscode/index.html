@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" dir=>
+
+<head>
+  <meta name="generator" content="Hugo 0.80.0" />
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="为 Ubuntu 配置 SSH 连接并对接 VSCode#以下以 母机 代称虚拟机所运行在的实体机。
+生成密钥#在母机 PowerShell 中，执行如下命令，
+PS C:\Windows\system32&gt; cd ~/.ssh PS C:\Users\i\.ssh&gt; ls 目录: C:\Users\i\.ssh Mode LastWriteTime Length Name ---- ------------- ------ ---- -a---- 2021-01-06 23:33 142 config -a---- 2021-01-06 23:24 1679 id_rsa -a---- 2021-01-06 23:24 400 id_rsa.pub -a---- 2021-01-06 23:34 176 known_hosts 可以看到存在 id_rsa, id_rsa.pub 文件，说明已经有密钥了。如果你没有，请如此生成一个：
+执行：
+PS C:\Users\i\.ssh&gt; ssh-keygen -o Enter file in which to save the key (C:\Users\i/.">
+<meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
+<meta property="og:description" content="为 Ubuntu 配置 SSH 连接并对接 VSCode#以下以 母机 代称虚拟机所运行在的实体机。
+生成密钥#在母机 PowerShell 中，执行如下命令，
+PS C:\Windows\system32&gt; cd ~/.ssh PS C:\Users\i\.ssh&gt; ls 目录: C:\Users\i\.ssh Mode LastWriteTime Length Name ---- ------------- ------ ---- -a---- 2021-01-06 23:33 142 config -a---- 2021-01-06 23:24 1679 id_rsa -a---- 2021-01-06 23:24 400 id_rsa.pub -a---- 2021-01-06 23:34 176 known_hosts 可以看到存在 id_rsa, id_rsa.pub 文件，说明已经有密钥了。如果你没有，请如此生成一个：
+执行：
+PS C:\Users\i\.ssh&gt; ssh-keygen -o Enter file in which to save the key (C:\Users\i/." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://os-dev.incolore.net/docs/1.5-%E4%B8%BA-ubuntu-%E9%85%8D%E7%BD%AE-ssh-%E8%BF%9E%E6%8E%A5%E5%B9%B6%E5%AF%B9%E6%8E%A5-vscode/" />
+
+<title>1.5 为 Ubuntu 配置 S S H 连接并对接 v S Code | 操作系统开发</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/book.min.134b70e5316650a530cb42e4e8630b2a01d532bebfc0337028211175336e4806.css" integrity="sha256-E0tw5TFmUKUwy0Lk6GMLKgHVMr6/wDNwKCERdTNuSAY=">
+<script defer src="/en.search.min.b010db487322eb6c726f5b640855529c8baf627e7463d98aa85ae4bd77fb406b.js" integrity="sha256-sBDbSHMi62xyb1tkCFVSnIuvYn50Y9mKqFrkvXf7QGs="></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body dir=>
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/"><span>操作系统开发</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li>1. 开发环境搭建
+<ul>
+<li><a href="/docs/1.1-virtualbox-%E7%9A%84%E5%AE%89%E8%A3%85/">1.1 VirtualBox 的安装</a></li>
+<li><a href="/docs/1.2-%E5%9C%A8-virtualbox-%E5%AE%89%E8%A3%85-ubuntu-%E7%B3%BB%E7%BB%9F/">1.2 在 VirtualBox 安装 Ubuntu 系统</a></li>
+<li><a href="/docs/1.3-%E4%B8%BA-ubuntu-%E8%A7%A3%E9%99%A4%E7%BD%91%E7%BB%9C%E5%B0%81%E9%94%81/">1.3 为 Ubuntu 解除网络封锁</a></li>
+<li><a href="/docs/1.4-%E4%B8%BA-ubuntu-%E5%AE%89%E8%A3%85%E5%A2%9E%E5%BC%BA%E5%8A%9F%E8%83%BD/">1.4 为 Ubuntu 安装增强功能</a></li>
+<li><a href="/docs/1.5-%E4%B8%BA-ubuntu-%E9%85%8D%E7%BD%AE-ssh-%E8%BF%9E%E6%8E%A5%E5%B9%B6%E5%AF%B9%E6%8E%A5-vscode/"class=active>1.5 为 Ubuntu 配置 SSH 连接并对接 VSCode</a></li>
+</ul>
+</li>
+<li><a href="/posts/">Blog</a>
+<ul>
+<li><a href="/posts/windows-%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C/">Windows 基础操作</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>1.5 为 Ubuntu 配置 S S H 连接并对接 v S Code</strong>
+
+  <label for="toc-control">
+    
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#生成密钥">生成密钥</a></li>
+    <li><a href="#virtual-box-的配置">Virtual Box 的配置</a></li>
+    <li><a href="#查看虚拟机分配到的-ip-地址">查看虚拟机分配到的 IP 地址</a></li>
+    <li><a href="#在-ubuntu-安装-ssh-服务器">在 Ubuntu 安装 SSH 服务器</a></li>
+    <li><a href="#通过-ssh-连接到虚拟机">通过 SSH 连接到虚拟机</a></li>
+    <li><a href="#安装密钥">安装密钥</a></li>
+    <li><a href="#检验密钥登录">检验密钥登录</a></li>
+    <li><a href="#配置-vscode-远程开发">配置 VSCode 远程开发</a></li>
+  </ul>
+</nav>
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="为-ubuntu-配置-ssh-连接并对接-vscode">
+  为 Ubuntu 配置 SSH 连接并对接 VSCode
+  <a class="anchor" href="#%e4%b8%ba-ubuntu-%e9%85%8d%e7%bd%ae-ssh-%e8%bf%9e%e6%8e%a5%e5%b9%b6%e5%af%b9%e6%8e%a5-vscode">#</a>
+</h1>
+<p>以下以 <em>母机</em> 代称虚拟机所运行在的实体机。</p>
+<h2 id="生成密钥">
+  生成密钥
+  <a class="anchor" href="#%e7%94%9f%e6%88%90%e5%af%86%e9%92%a5">#</a>
+</h2>
+<p>在母机 PowerShell 中，执行如下命令，</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">PS C:\Windows\system32&gt; cd ~/.ssh
+PS C:\Users\i\.ssh&gt; ls
+
+
+    目录<span style="color:#960050;background-color:#1e0010">:</span> C:\Users\i\.ssh
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       2021-01-06     23<span style="color:#960050;background-color:#1e0010">:</span>33            142 config
+-a----       2021-01-06     23<span style="color:#960050;background-color:#1e0010">:</span>24           1679 id_rsa
+-a----       2021-01-06     23<span style="color:#960050;background-color:#1e0010">:</span>24            400 id_rsa.pub
+-a----       2021-01-06     23<span style="color:#960050;background-color:#1e0010">:</span>34            176 known_hosts
+</code></pre></div><p>可以看到存在 <code>id_rsa</code>, <code>id_rsa.pub</code> 文件，说明已经有密钥了。如果你没有，请如此生成一个：</p>
+<p>执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">PS C:\Users\i\.ssh&gt; ssh-keygen -o
+Enter file <span style="color:#66d9ef">in</span> which to save the key (C:\Users\i/.ssh/id_rsa)<span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#960050;background-color:#1e0010">（</span>按一下回车<span style="color:#960050;background-color:#1e0010">）</span>
+</code></pre></div><p>之后输入密码，可以留空。然后回车。之后执行 <code>ls</code> 指令，可看到生成的文件。</p>
+<blockquote>
+<p>这些密钥包括公钥：<code>id_rsa.pub</code> 和私钥 <code>id_rsa</code> 两个文件。</p>
+<p>公钥和私钥用于加密和解密。你可以公开你的公钥，但<strong>私钥无论如何都不能公开</strong>。</p>
+<p>加密的算法称为 <strong>非对称加密</strong>。你可以理解为：你把自己的锁头公开，大家都可以用你的锁加密，但是加密之后只有你的私钥能解锁，其他任何能都不能解锁。</p>
+<p>对于我们的 SSH 服务器，你可以理解为：安装了公钥的机器，我们都可以用私钥登录，而没有你的私钥的人不能登录。</p>
+</blockquote>
+<p>下面我们查看公钥：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">PS C:\Users\i\.ssh&gt; cat ~\.ssh\id_rsa.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0qD7ZFS1iPXdla1tku2UPZN8XoCCMSt0WCdLzVafb/qZNVJdOM6kSv3zeEDukAvWOcOXA0+J6bkxiV6TJuOcyqq5S5uXZPSC5LpbWyyMINygKE+Cb2WK6dvWzD3INxtV81sBuEhw2xhN7upVYrbAB5x1W3a0Ewu75JY0zExpvmUxd3OHUtlavlr3qBveqZLccYSLcymYYAkla4muvtpdamspkEuQMeHFV+K1/U6Gh/nmQ6tOPeBaCzCsh8SQYknc3+Jdckj3K1stltCGNqwwsf/1AYX4Qg5YJok0bP/qk5aFMdmh2gsxwC6zthyUsI/6+zZn4KXAXeMfSuVU/Ti0B i@DESKTOP-8LN4JKI
+</code></pre></div><p>将 <code>ssh-rsa ...</code> 复制。后面要用。</p>
+<p>（注：不要复制我的，每个人不一样的哦。当然我不介意你把自己的电脑控制权交给我~）</p>
+<h2 id="virtual-box-的配置">
+  Virtual Box 的配置
+  <a class="anchor" href="#virtual-box-%e7%9a%84%e9%85%8d%e7%bd%ae">#</a>
+</h2>
+<p>关机后，打开虚拟机的设置界面：</p>
+<p><img src="/images/image-20210122172407920.png" alt="image-20210122172407920" /></p>
+<p>找到 <em>网络 / 网卡 2</em>：</p>
+<p><img src="/images/image-20210122172435825.png" alt="image-20210122172435825" /></p>
+<p>勾选 <em>启用网络连接</em>，连接方式为 <em>仅主机（Host-Only）网络</em>。</p>
+<h2 id="查看虚拟机分配到的-ip-地址">
+  查看虚拟机分配到的 IP 地址
+  <a class="anchor" href="#%e6%9f%a5%e7%9c%8b%e8%99%9a%e6%8b%9f%e6%9c%ba%e5%88%86%e9%85%8d%e5%88%b0%e7%9a%84-ip-%e5%9c%b0%e5%9d%80">#</a>
+</h2>
+<p>开机，然后打开终端。执行如下命令：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~$ ip addr
+</code></pre></div><p>注意结果中的 <code>inet</code> 后面部分，就是你的虚拟机的 IP 地址：</p>
+<p><img src="/images/image-20210122173236295.png" alt="image-20210122173236295" /></p>
+<p>我们关注的是 <code>192.168.56.xxx</code> 这个地址，是关联到 VirtualBox 的网卡的。这里是 <code>192.168.56.101</code>。</p>
+<p>在母机中执行以下命令：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">PS C:\Windows\system32&gt; ping 192.168.56.101
+
+正在 Ping 192.168.56.101 具有 32 字节的数据<span style="color:#960050;background-color:#1e0010">:</span>
+来自 192.168.56.101 的回复<span style="color:#960050;background-color:#1e0010">:</span> 字节=32 时间&lt;1ms TTL=64
+来自 192.168.56.101 的回复<span style="color:#960050;background-color:#1e0010">:</span> 字节=32 时间&lt;1ms TTL=64
+
+192.168.56.101 的 Ping 统计信息<span style="color:#960050;background-color:#1e0010">:</span>
+    数据包<span style="color:#960050;background-color:#1e0010">:</span> 已发送 = 2<span style="color:#960050;background-color:#1e0010">，</span>已接收 = 2<span style="color:#960050;background-color:#1e0010">，</span>丢失 = 0 (0% 丢失)<span style="color:#960050;background-color:#1e0010">，</span>
+往返行程的估计时间(以毫秒为单位)<span style="color:#960050;background-color:#1e0010">:</span>
+    最短 = 0ms<span style="color:#960050;background-color:#1e0010">，</span>最长 = 0ms<span style="color:#960050;background-color:#1e0010">，</span>平均 = 0ms
+Control-C
+</code></pre></div><p>这表示 Ping 通。</p>
+<h2 id="在-ubuntu-安装-ssh-服务器">
+  在 Ubuntu 安装 SSH 服务器
+  <a class="anchor" href="#%e5%9c%a8-ubuntu-%e5%ae%89%e8%a3%85-ssh-%e6%9c%8d%e5%8a%a1%e5%99%a8">#</a>
+</h2>
+<p>执行如下指令：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~$ sudo apt-get install -y openssh-server
+</code></pre></div><p>如此确认结果：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">luvet@localos:~$ sudo service ssh status
+● ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded <span style="color:#f92672">(</span>/lib/systemd/system/ssh.service; enabled; vendor preset: enabled<span style="color:#f92672">)</span>
+     Active: active <span style="color:#f92672">(</span>running<span style="color:#f92672">)</span> since Fri 2021-01-22 19:59:18 CST; 47s ago
+       Docs: man:sshd<span style="color:#f92672">(</span>8<span style="color:#f92672">)</span>
+             man:sshd_config<span style="color:#f92672">(</span>5<span style="color:#f92672">)</span>
+   Main PID: <span style="color:#ae81ff">3276</span> <span style="color:#f92672">(</span>sshd<span style="color:#f92672">)</span>
+      Tasks: <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>limit: 1104<span style="color:#f92672">)</span>
+     Memory: 1.4M
+     CGroup: /system.slice/ssh.service
+             └─3276 sshd: /usr/sbin/sshd -D <span style="color:#f92672">[</span>listener<span style="color:#f92672">]</span> <span style="color:#ae81ff">0</span> of 10-100 startups
+
+1月 <span style="color:#ae81ff">22</span> 19:59:18 localos systemd<span style="color:#f92672">[</span>1<span style="color:#f92672">]</span>: Starting OpenBSD Secure Shell server...
+1月 <span style="color:#ae81ff">22</span> 19:59:18 localos sshd<span style="color:#f92672">[</span>3276<span style="color:#f92672">]</span>: Server listening on 0.0.0.0 port 22.
+1月 <span style="color:#ae81ff">22</span> 19:59:18 localos sshd<span style="color:#f92672">[</span>3276<span style="color:#f92672">]</span>: Server listening on :: port 22.
+1月 <span style="color:#ae81ff">22</span> 19:59:18 localos systemd<span style="color:#f92672">[</span>1<span style="color:#f92672">]</span>: Started OpenBSD Secure Shell server.
+</code></pre></div><p>看到 <code>active (running)</code>，说明成功。</p>
+<h2 id="通过-ssh-连接到虚拟机">
+  通过 SSH 连接到虚拟机
+  <a class="anchor" href="#%e9%80%9a%e8%bf%87-ssh-%e8%bf%9e%e6%8e%a5%e5%88%b0%e8%99%9a%e6%8b%9f%e6%9c%ba">#</a>
+</h2>
+<p>在母机中执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">PS C:\Users\i\.ssh&gt; ssh pluvet@192.168.56.101
+The authenticity of host <span style="color:#e6db74">&#39;192.168.56.101 (192.168.56.101)&#39;</span> can<span style="color:#e6db74">&#39;t be established.
+</span><span style="color:#e6db74">ECDSA key fingerprint is SHA256:RtmUrCnlAAl+sJriAY095r1qROL5ePob8I7BSY99K4o.
+</span><span style="color:#e6db74">Are you sure you want to continue connecting (yes/no)? yes
+</span><span style="color:#e6db74">Warning: Permanently added &#39;</span>192.168.56.101<span style="color:#e6db74">&#39; (ECDSA) to the list of known hosts.
+</span><span style="color:#e6db74">pluvet@192.168.56.101&#39;</span>s password<span style="color:#960050;background-color:#1e0010">:</span>
+Welcome to Ubuntu 20.10 (GNU/Linux 5.8.0-25-generic x86_64)
+
+ * Documentation<span style="color:#960050;background-color:#1e0010">:</span>  https<span style="color:#960050;background-color:#1e0010">:</span>//help.ubuntu.com
+ * Management<span style="color:#960050;background-color:#1e0010">:</span>     https<span style="color:#960050;background-color:#1e0010">:</span>//landscape.canonical.com
+ * Support<span style="color:#960050;background-color:#1e0010">:</span>        https<span style="color:#960050;background-color:#1e0010">:</span>//ubuntu.com/advantage
+
+205 updates can be installed immediately.
+83 of these updates are security updates.
+To see these additional updates run<span style="color:#960050;background-color:#1e0010">:</span> apt list --upgradable
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms <span style="color:#66d9ef">for</span> each program are described <span style="color:#66d9ef">in</span> the
+individual files <span style="color:#66d9ef">in</span> /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+pluvet@localos<span style="color:#960050;background-color:#1e0010">:</span>~$
+</code></pre></div><p>其中 <code>pluvet</code> 是你设置的用户名。</p>
+<p><code>192.168.56.101</code> 是 Ubuntu 的 IP 地址。</p>
+<h2 id="安装密钥">
+  安装密钥
+  <a class="anchor" href="#%e5%ae%89%e8%a3%85%e5%af%86%e9%92%a5">#</a>
+</h2>
+<p>在刚才连入的 Ubuntu 终端执行如下指令：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~$ mkdir ~/.ssh
+pluvet@localos:~$ vi ~/.ssh/authorized_keys 
+</code></pre></div><p>将公钥添加到文件中，保存：</p>
+<p><img src="/images/image-20210122200612634.png" alt="image-20210122200612634" /></p>
+<p>重启 SSH 服务：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~$ sudo service ssh restart
+</code></pre></div><p>现在，应该可以免密码登录了。</p>
+<h2 id="检验密钥登录">
+  检验密钥登录
+  <a class="anchor" href="#%e6%a3%80%e9%aa%8c%e5%af%86%e9%92%a5%e7%99%bb%e5%bd%95">#</a>
+</h2>
+<p>退出终端：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">pluvet@localos<span style="color:#960050;background-color:#1e0010">:</span>~$ exit
+logout
+Connection to 192.168.56.101 closed.
+PS C:\Users\i\.ssh&gt;
+</code></pre></div><p>再次执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">PS C:\Users\i\.ssh&gt; ssh pluvet@192.168.56.101
+Welcome to Ubuntu 20.10 (GNU/Linux 5.8.0-25-generic x86_64)
+
+ * Documentation<span style="color:#960050;background-color:#1e0010">:</span>  https<span style="color:#960050;background-color:#1e0010">:</span>//help.ubuntu.com
+ * Management<span style="color:#960050;background-color:#1e0010">:</span>     https<span style="color:#960050;background-color:#1e0010">:</span>//landscape.canonical.com
+ * Support<span style="color:#960050;background-color:#1e0010">:</span>        https<span style="color:#960050;background-color:#1e0010">:</span>//ubuntu.com/advantage
+
+205 updates can be installed immediately.
+83 of these updates are security updates.
+To see these additional updates run<span style="color:#960050;background-color:#1e0010">:</span> apt list --upgradable
+
+Last login<span style="color:#960050;background-color:#1e0010">:</span> Fri Jan 22 20<span style="color:#960050;background-color:#1e0010">:</span>02<span style="color:#960050;background-color:#1e0010">:</span>51 2021 from 192.168.56.1
+pluvet@localos<span style="color:#960050;background-color:#1e0010">:</span>~$
+</code></pre></div><p>可以看到，直接登录成功。这是因为默认使用了 <code>~/.ssh/id_rsa</code> 私钥进行登录。</p>
+<h2 id="配置-vscode-远程开发">
+  配置 VSCode 远程开发
+  <a class="anchor" href="#%e9%85%8d%e7%bd%ae-vscode-%e8%bf%9c%e7%a8%8b%e5%bc%80%e5%8f%91">#</a>
+</h2>
+<p>首先我们安装几个常用软件：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~$ sudo apt install -y wget git curl vim
+</code></pre></div><p>然后，在 Windows 上安装 VSCode，并安装 <em>Remote - SSH</em> 扩展：</p>
+<p><img src="/images/image-20210122201549463.png" alt="image-20210122201549463" /></p>
+<p>点击左下角按钮：</p>
+<p><img src="/images/image-20210122201630227.png" alt="image-20210122201630227" /></p>
+<p>打开配置文件：</p>
+<p><img src="/images/image-20210122201652856.png" alt="image-20210122201652856" /></p>
+<p>编辑第一个：</p>
+<p><img src="/images/image-20210122201707366.png" alt="image-20210122201707366" /></p>
+<p>在打开的文件中追加如下内容：</p>
+<pre><code>Host local_os
+    HostName 192.168.56.101
+    User pluvet
+</code></pre><p><img src="/images/image-20210122201840218.png" alt="image-20210122201840218" /></p>
+<p>保存。然后点击左下角按钮：</p>
+<p><img src="/images/image-20210122201630227.png" alt="image-20210122201630227" /></p>
+<p>选择第一项或第二项：</p>
+<p><img src="/images/image-20210122202539158.png" alt="image-20210122202539158" /></p>
+<p>点击你要连接的服务器：</p>
+<p><img src="/images/image-20210122202601626.png" alt="image-20210122202601626" /></p>
+<p>类型选择 <em>Linux</em>：</p>
+<p><img src="/images/image-20210122202622487.png" alt="image-20210122202622487" /></p>
+<p>连接成功后，可如此操作进入终端：</p>
+<p><img src="/images/image-20210122202927052.png" alt="image-20210122202927052" /></p>
+<p>新建个文件夹：</p>
+<p><img src="/images/image-20210122202947781.png" alt="image-20210122202947781" /></p>
+<p>执行 <code>code 文件夹/文件</code> 即可编辑文件夹 / 文件：</p>
+<p><img src="/images/image-20210122203016708.png" alt="image-20210122203016708" /></p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#生成密钥">生成密钥</a></li>
+    <li><a href="#virtual-box-的配置">Virtual Box 的配置</a></li>
+    <li><a href="#查看虚拟机分配到的-ip-地址">查看虚拟机分配到的 IP 地址</a></li>
+    <li><a href="#在-ubuntu-安装-ssh-服务器">在 Ubuntu 安装 SSH 服务器</a></li>
+    <li><a href="#通过-ssh-连接到虚拟机">通过 SSH 连接到虚拟机</a></li>
+    <li><a href="#安装密钥">安装密钥</a></li>
+    <li><a href="#检验密钥登录">检验密钥登录</a></li>
+    <li><a href="#配置-vscode-远程开发">配置 VSCode 远程开发</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

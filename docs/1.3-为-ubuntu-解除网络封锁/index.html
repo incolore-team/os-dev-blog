@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" dir=>
+
+<head>
+  <meta name="generator" content="Hugo 0.80.0" />
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="为 Ubuntu 解除网络封锁# 外交部耿爽表示：正确地看待并维护中美在科技、人文领域的交流合作，多做有利于增进中美互信与合作的事情，要拉手而不是松手，要拆墙而不是筑墙。
+ 为了避免今后遇到的各种奇葩网络问题，我们今天要先做一点微小的工作。
+创建 HTTP 局域网代理服务器#这一步是把我们的科学上网工具转化为一个 HTTP 代理服务器。需要得到一个 http://ip:port 形式的地址。对于 v2ray, shadowsocks, Clash, 操作有所不同。这里以 Clash 为例。如果你使用的是其它程序，请自行搜索“xxx http 局域网代理”。
+查看自己的 IP 地址#按下 Win&#43;X 键。（Win 键就是能打开开始菜单那个键，在你的键盘的最底下一行，一般有个窗户的样子）
+打开 PowerShell，执行如下命令：
+PS C:\Windows\system32&gt; ipconfig 你会看到：
+Windows IP 配置 以太网适配器 以太网: 连接特定的 DNS 后缀 . . . . . . . : 本地链接 IPv6 地址. . . . . . . . : fe80::a5de:d926:8b89:ab0c%7 IPv4 地址 .">
+<meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
+<meta property="og:description" content="为 Ubuntu 解除网络封锁# 外交部耿爽表示：正确地看待并维护中美在科技、人文领域的交流合作，多做有利于增进中美互信与合作的事情，要拉手而不是松手，要拆墙而不是筑墙。
+ 为了避免今后遇到的各种奇葩网络问题，我们今天要先做一点微小的工作。
+创建 HTTP 局域网代理服务器#这一步是把我们的科学上网工具转化为一个 HTTP 代理服务器。需要得到一个 http://ip:port 形式的地址。对于 v2ray, shadowsocks, Clash, 操作有所不同。这里以 Clash 为例。如果你使用的是其它程序，请自行搜索“xxx http 局域网代理”。
+查看自己的 IP 地址#按下 Win&#43;X 键。（Win 键就是能打开开始菜单那个键，在你的键盘的最底下一行，一般有个窗户的样子）
+打开 PowerShell，执行如下命令：
+PS C:\Windows\system32&gt; ipconfig 你会看到：
+Windows IP 配置 以太网适配器 以太网: 连接特定的 DNS 后缀 . . . . . . . : 本地链接 IPv6 地址. . . . . . . . : fe80::a5de:d926:8b89:ab0c%7 IPv4 地址 ." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://os-dev.incolore.net/docs/1.3-%E4%B8%BA-ubuntu-%E8%A7%A3%E9%99%A4%E7%BD%91%E7%BB%9C%E5%B0%81%E9%94%81/" />
+
+<title>1.3 为 Ubuntu 解除网络封锁 | 操作系统开发</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/book.min.134b70e5316650a530cb42e4e8630b2a01d532bebfc0337028211175336e4806.css" integrity="sha256-E0tw5TFmUKUwy0Lk6GMLKgHVMr6/wDNwKCERdTNuSAY=">
+<script defer src="/en.search.min.b010db487322eb6c726f5b640855529c8baf627e7463d98aa85ae4bd77fb406b.js" integrity="sha256-sBDbSHMi62xyb1tkCFVSnIuvYn50Y9mKqFrkvXf7QGs="></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body dir=>
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/"><span>操作系统开发</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li>1. 开发环境搭建
+<ul>
+<li><a href="/docs/1.1-virtualbox-%E7%9A%84%E5%AE%89%E8%A3%85/">1.1 VirtualBox 的安装</a></li>
+<li><a href="/docs/1.2-%E5%9C%A8-virtualbox-%E5%AE%89%E8%A3%85-ubuntu-%E7%B3%BB%E7%BB%9F/">1.2 在 VirtualBox 安装 Ubuntu 系统</a></li>
+<li><a href="/docs/1.3-%E4%B8%BA-ubuntu-%E8%A7%A3%E9%99%A4%E7%BD%91%E7%BB%9C%E5%B0%81%E9%94%81/"class=active>1.3 为 Ubuntu 解除网络封锁</a></li>
+<li><a href="/docs/1.4-%E4%B8%BA-ubuntu-%E5%AE%89%E8%A3%85%E5%A2%9E%E5%BC%BA%E5%8A%9F%E8%83%BD/">1.4 为 Ubuntu 安装增强功能</a></li>
+<li><a href="/docs/1.5-%E4%B8%BA-ubuntu-%E9%85%8D%E7%BD%AE-ssh-%E8%BF%9E%E6%8E%A5%E5%B9%B6%E5%AF%B9%E6%8E%A5-vscode/">1.5 为 Ubuntu 配置 SSH 连接并对接 VSCode</a></li>
+</ul>
+</li>
+<li><a href="/posts/">Blog</a>
+<ul>
+<li><a href="/posts/windows-%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C/">Windows 基础操作</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>1.3 为 Ubuntu 解除网络封锁</strong>
+
+  <label for="toc-control">
+    
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#创建-http-局域网代理服务器">创建 HTTP 局域网代理服务器</a>
+      <ul>
+        <li><a href="#查看自己的-ip-地址">查看自己的 IP 地址</a></li>
+        <li><a href="#clash-的操作">Clash 的操作</a></li>
+        <li><a href="#现在你的代理地址">现在你的代理地址</a></li>
+        <li><a href="#你的代理设置语句">你的代理设置语句</a></li>
+      </ul>
+    </li>
+    <li><a href="#设置-linux-上使用代理">设置 Linux 上使用代理</a></li>
+    <li><a href="#使-sudo-语句也使用代理">使 sudo 语句也使用代理</a></li>
+  </ul>
+</nav>
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="为-ubuntu-解除网络封锁">
+  为 Ubuntu 解除网络封锁
+  <a class="anchor" href="#%e4%b8%ba-ubuntu-%e8%a7%a3%e9%99%a4%e7%bd%91%e7%bb%9c%e5%b0%81%e9%94%81">#</a>
+</h1>
+<blockquote>
+<p>外交部耿爽表示：正确地看待并维护中美在科技、人文领域的交流合作，多做有利于增进中美互信与合作的事情，要拉手而不是松手，要拆墙而不是筑墙。</p>
+</blockquote>
+<p>为了避免今后遇到的各种奇葩网络问题，我们今天要先做一点微小的工作。</p>
+<h2 id="创建-http-局域网代理服务器">
+  创建 HTTP 局域网代理服务器
+  <a class="anchor" href="#%e5%88%9b%e5%bb%ba-http-%e5%b1%80%e5%9f%9f%e7%bd%91%e4%bb%a3%e7%90%86%e6%9c%8d%e5%8a%a1%e5%99%a8">#</a>
+</h2>
+<p>这一步是把我们的科学上网工具转化为一个 HTTP 代理服务器。需要得到一个 http://ip:port 形式的地址。对于 v2ray, shadowsocks, Clash, 操作有所不同。这里以 Clash 为例。如果你使用的是其它程序，请自行搜索“xxx http 局域网代理”。</p>
+<h3 id="查看自己的-ip-地址">
+  查看自己的 IP 地址
+  <a class="anchor" href="#%e6%9f%a5%e7%9c%8b%e8%87%aa%e5%b7%b1%e7%9a%84-ip-%e5%9c%b0%e5%9d%80">#</a>
+</h3>
+<p>按下 <em>Win+X</em> 键。（Win 键就是能打开开始菜单那个键，在你的键盘的最底下一行，一般有个窗户的样子）</p>
+<p><img src="/images/image-20210122084937981.png" alt="image-20210122084937981" /></p>
+<p>打开 PowerShell，执行如下命令：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-powershell" data-lang="powershell">PS C:\Windows\system32&gt; ipconfig
+</code></pre></div><p>你会看到：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Windows IP 配置
+
+
+以太网适配器 以太网:
+
+   连接特定的 DNS 后缀 . . . . . . . :
+   本地链接 IPv6 地址. . . . . . . . : fe80::a5de:d926:8b89:ab0c%7
+   IPv4 地址 . . . . . . . . . . . . : 192.168.0.111
+   子网掩码  . . . . . . . . . . . . : 255.255.255.0
+   默认网关. . . . . . . . . . . . . : 192.168.0.1
+
+以太网适配器 VirtualBox Host-Only Network:
+
+   连接特定的 DNS 后缀 . . . . . . . :
+   本地链接 IPv6 地址. . . . . . . . : fe80::5c82:dfed:f58c:b213%13
+   IPv4 地址 . . . . . . . . . . . . : 192.168.56.1
+   子网掩码  . . . . . . . . . . . . : 255.255.255.0
+   默认网关. . . . . . . . . . . . . :
+</code></pre></div><p>上面有两个 IPv4 地址。其中 <code>192.168.0.111</code> 一般是家用路由器自动分配的，会变。我们不用这一个。</p>
+<p>我们关注的是 <code>VirtualBox Host-Only Network</code> 下面这个地址：<code>192.168.56.1</code> 记下来。</p>
+<h3 id="clash-的操作">
+  Clash 的操作
+  <a class="anchor" href="#clash-%e7%9a%84%e6%93%8d%e4%bd%9c">#</a>
+</h3>
+<p>首先需要下载：<a href="https://github.com/Fndroid/clash_for_windows_pkg/releases">Releases · Fndroid/clash_for_windows_pkg (github.com)</a>。对于 Windows（你的真机安装的系统），点击 页面中的<a href="https://github.com/Fndroid/clash_for_windows_pkg/releases/download/0.14.1/Clash.for.Windows.Setup.0.14.1.exe">Clash.for.Windows.Setup.xxx.exe</a> 下载安装包。运行后看到：</p>
+<p><img src="/images/image-20210122083905798.png" alt="image-20210122083905798" /></p>
+<p>一直点下一步即可。途中杀毒软件可能会警告：</p>
+<p><img src="/images/image-20210122084022505.png" alt="image-20210122084022505" /></p>
+<p>直接允许就行。软件是开放源代码的，请不必担心。</p>
+<p>在软件中，切换到如下界面：</p>
+<p><img src="/images/image-20210122084114644.png" alt="image-20210122084114644" /></p>
+<p>看到上面文本框吗？里面写着 <em>Download from a URL</em>，把你的<strong>订阅链接</strong>复制进来，然后点 <em>Download</em> 按钮。等待出现新的配置文件于下方。点击使其变深色，表示已启用。</p>
+<p>切换到 <em>General</em> 界面：</p>
+<p><img src="/images/image-20210122084344178.png" alt="image-20210122084344178" /></p>
+<p>Port 处是端口。我这里由于历史遗留问题，就写成 <em>10809</em>，其它的也行，只要是空闲的端口。（<strong>记住这里的端口号，重要！</strong>）</p>
+<p>下面 <em>Allow LAN</em> 要启用。点一下右边的开关，绿色表示已经启用。</p>
+<h3 id="现在你的代理地址">
+  现在你的代理地址
+  <a class="anchor" href="#%e7%8e%b0%e5%9c%a8%e4%bd%a0%e7%9a%84%e4%bb%a3%e7%90%86%e5%9c%b0%e5%9d%80">#</a>
+</h3>
+<pre><code>http://192.168.56.1:10809
+</code></pre><p>（上面的 IP，也即 <code>192.168.56.1</code> 部分，和端口，也即 <code>10809</code> 部分，每个人情况可能不同，请自己替换）</p>
+<p>（上面的字符都是英文字符，不要用中文冒号！）</p>
+<p>这个东西叫做 HTTP PROXY.</p>
+<h3 id="你的代理设置语句">
+  你的代理设置语句
+  <a class="anchor" href="#%e4%bd%a0%e7%9a%84%e4%bb%a3%e7%90%86%e8%ae%be%e7%bd%ae%e8%af%ad%e5%8f%a5">#</a>
+</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">export http_proxy=&#34;http://192.168.56.1:10809&#34;
+export https_proxy=&#34;http://192.168.56.1:10809&#34;
+</code></pre></div><p>注意，<code>https_proxy</code> 对应的也是 <code>http://192.168.56.1:10809</code>，因为我们搭建的是 HTTP 代理服务器，而不是 HTTPS 代理服务器，后者还有一个安全加密层。</p>
+<h2 id="设置-linux-上使用代理">
+  设置 Linux 上使用代理
+  <a class="anchor" href="#%e8%ae%be%e7%bd%ae-linux-%e4%b8%8a%e4%bd%bf%e7%94%a8%e4%bb%a3%e7%90%86">#</a>
+</h2>
+<p>把上面这两句写入到 <code>~/.bashrc</code> 文件中。</p>
+<blockquote>
+<p><code>~</code> 表示的是家目录，对于 <code>pluvet</code> 用户而言，就是 <code>/home/pluvet</code> 目录。（目录就是文件夹的意思，Folder 或者 Directory。）</p>
+<p><code>~/.bashrc</code> 文件就是 <code>/home/pluvet/.bashrc</code> 文件</p>
+</blockquote>
+<p>写入文件的具体操作如下（使用 vi 编辑器）</p>
+<p>执行</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~ $ vi ~/.bashrc
+</code></pre></div><p>其中 <code>vi</code> 表示程序</p>
+<p>后面的 <code>~/.bashrc</code> 表示参数，这里的参数是文件名。</p>
+<p>执行之后会看到：</p>
+<p><img src="/images/image-20210122090259734.png" alt="image-20210122090259734" /></p>
+<p>此时编辑器处于 <strong>命令模式</strong>，也就是你按下的键被当做命令。按下 <code>i</code> 键会进入<strong>编辑模式</strong>，此时你输入的内容会插入到文件中。</p>
+<p>在编辑模式按下 <em>Esc</em> 键会退出编辑模式，回到命令模式。</p>
+<blockquote>
+<p>关于 vi 编辑器的更多使用方法，详见：<a href="https://www.runoob.com/linux/linux-vim.html">Linux vi/vim | 菜鸟教程 (runoob.com)</a></p>
+<p>这里给出几个常用的：</p>
+<ul>
+<li>
+<p>dd 删除当前行</p>
+</li>
+<li>
+<p>x 删除当前光标处字符</p>
+</li>
+<li>
+<p>$ 行末</p>
+</li>
+<li>
+<p>^ 行首</p>
+</li>
+<li>
+<p>h/j/k/l 左下上右移动光标</p>
+</li>
+</ul>
+</blockquote>
+<p>我们在 <strong>命令模式</strong> 按下 <em>shift+g</em>，或者 <em>G</em>，会跳转到文件的最后一行：</p>
+<p><strong><img src="/images/image-20210122090611637.png" alt="image-20210122090611637" /></strong></p>
+<p>打入 <em>$</em> 命令（<em>Shift+4</em>），跳转到行尾：</p>
+<p><img src="/images/image-20210122091219779.png" alt="image-20210122091219779" /></p>
+<p>然后按下 <em>a</em> 进入编辑模式。不同之处在于按下 <em>i</em> 是插入（insert），<em>a</em> 是追加（append）。</p>
+<blockquote>
+<p>如果文件被你搞乱了，就按 <em>Esc</em> 回到命令模式，然后按下 <em>shift+;</em> 也就是 <em>:</em>（冒号），左下角会出现一个：<code>:</code>，输入 <code>q!</code>，变成 <code>:q!</code>，此时按下回车，就会强制退出编辑，不保存变更。然后你可以从头再来。</p>
+</blockquote>
+<p><img src="/images/image-20210122091307407.png" alt="image-20210122091307407" /></p>
+<p>输入一个换行符（按一下回车）：</p>
+<p><img src="/images/image-20210122091345703.png" alt="image-20210122091345703" /></p>
+<p>输入代理设置语句：</p>
+<pre><code>export http_proxy=&quot;http://192.168.56.1:10809&quot;
+export https_proxy=&quot;http://192.168.56.1:10809&quot;
+</code></pre><blockquote>
+<p>注：上面的语句的意思是：设置 <code>http_proxy</code> 环境变量的值为 <code>http://192.168.56.1:10809</code>，设置 <code>https_proxy</code> 环境变量的值为 <code>http://192.168.56.1:10809</code>。</p>
+</blockquote>
+<p>退出编辑模式（<em>Esc</em>），执行 <code>:wq</code> （按 <em>shift+;</em> 输入冒号，然后按一下 w 和 q，然后按一下回车）保存。</p>
+<p><img src="/images/image-20210122091909756.png" alt="image-20210122091909756" /></p>
+<blockquote>
+<p>注意：不要在文件中输入一个 <code>:wq</code>，是在命令模式输入。</p>
+</blockquote>
+<p>保存之后，执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~ $ source ~/.bashrc
+</code></pre></div><p>使其生效。</p>
+<h2 id="使-sudo-语句也使用代理">
+  使 sudo 语句也使用代理
+  <a class="anchor" href="#%e4%bd%bf-sudo-%e8%af%ad%e5%8f%a5%e4%b9%9f%e4%bd%bf%e7%94%a8%e4%bb%a3%e7%90%86">#</a>
+</h2>
+<p>现在 <code>wget</code> 之类的程序已经可以使用代理了。但是 <code>sudo</code> 指令还不能。操作如下：</p>
+<p>sudo 编辑 <code>/etc/sudoers</code>：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~ $ sudo vi /etc/sudoers
+</code></pre></div><p>按 <em>/</em> 打开搜索，输入 <code>env_reset</code>：</p>
+<p><img src="/images/image-20210122092756280.png" alt="image-20210122092756280" /></p>
+<p>回车定位到其位置，在这行之后新建一行，写入</p>
+<pre><code>Defaults env_keep=&quot;http_proxy https_proxy&quot;
+</code></pre><p>然后保存：</p>
+<p><img src="/images/image-20210122092949526.png" alt="image-20210122092949526" /></p>
+<p>若是提示文件 Readonly，可以用 <code>wq!</code> 强制保存。</p>
+<p>接下来，依次执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~ $ sudo apt update
+pluvet@localos:~ $ sudo apt install curl
+pluvet@localos:~ $ curl -l http://www.google.com
+</code></pre></div><p>如果能看到满屏的 HTML 代码（而不是报错），说明成功了。</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#创建-http-局域网代理服务器">创建 HTTP 局域网代理服务器</a>
+      <ul>
+        <li><a href="#查看自己的-ip-地址">查看自己的 IP 地址</a></li>
+        <li><a href="#clash-的操作">Clash 的操作</a></li>
+        <li><a href="#现在你的代理地址">现在你的代理地址</a></li>
+        <li><a href="#你的代理设置语句">你的代理设置语句</a></li>
+      </ul>
+    </li>
+    <li><a href="#设置-linux-上使用代理">设置 Linux 上使用代理</a></li>
+    <li><a href="#使-sudo-语句也使用代理">使 sudo 语句也使用代理</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
