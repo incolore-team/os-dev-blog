@@ -117,6 +117,42 @@ PS C:\Users\i\.</description>
     
     <item>
       <title></title>
+      <link>https://os-dev.incolore.net/docs/1.6-%E5%9C%A8-ubuntu-%E4%B8%AD%E5%AE%89%E8%A3%85-bochs-%E8%99%9A%E6%8B%9F%E6%9C%BA/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://os-dev.incolore.net/docs/1.6-%E5%9C%A8-ubuntu-%E4%B8%AD%E5%AE%89%E8%A3%85-bochs-%E8%99%9A%E6%8B%9F%E6%9C%BA/</guid>
+      <description>下载 Bochs#访问 Bochs x86 PC emulator - Browse /bochs at SourceForge.net。
+找到最新版：
+我们要编译安装，所以下载 bochs-2.6.11.tar.gz
+下载之后是存放在 Windows 上的（当然，你也可以直接在 Ubuntu 中打开 Firefox 浏览器下载），我们直接用 VSCode 传输到 Ubuntu 中。
+传输源代码到 Linux 中#在 VSCode 打开终端（Ctrl+Shift+~），在 ~ 下创建 dev 目录：
+打开这个目录：
+然后将文件从 Windows 资源管理器直接拖进来就行：
+执行：
+pluvet@localos:~/dev$ tar -zvxf bochs-2.6.11.tar.gz 进行解压。
+进入解压到的目录
+pluvet@localos:~/dev$ cd bochs-2.6.11/ 编译安装#以防万一，请先执行：
+sudo apt install libx11-devsudo apt install xorg-dev编辑 bx_debug/dbg_main.cpp，变更如下：
+Description: Fix the build with SMP enabled Origin: https://sourceforge.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://os-dev.incolore.net/docs/2.1-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://os-dev.incolore.net/docs/2.1-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/</guid>
+      <description>什么是 BIOS#BIOS 就是内置在主板上的一个程序，当系统启动时，会执行 BIOS 中的代码，进行设备检查（称为自检）等等。当检查通过之后，会读取 启动设备 中的引导程序，从而将操作系统加载到内存运行。
+什么是引导程序#引导程序就是讲操作系统加载到内存，运行整个操作系统的程序。
+BIOS 如何执行引导程序#BIOS 会读取启动设备的前 512B（B 是字节单位，Byte），这些字节是设备的第一个扇区，如果这个扇区的结束字节是 0x55, 0xaa 则表示这个扇区是可引导扇区，这些字节称为（即主引导记录（master boot record，MBR）），将这一块加载到物理内存（具体位置是 0x7c00）中，然后执行其中的二进制代码（这些代码就是引导程序）。
+安装 NASM#NASM 是将汇编代码编译为二进制的工具。安装方式：
+sudo apt install nasm 安装 HexEdit#Hexedit 是一个十六进制编译器。安装：
+sudo apt install hexedit 第一个引导程序#下面，我们用 Intel 汇编，编写一个最简单的引导程序：
+; 告知编译器程序的起始位置org 0x7c00BaseOfStack equ 0x7c00Label_Start:mov ax, csmov ds, axmov es, axmov ss, axmov sp, BaseOfStack; ======== 清屏mov ax, 0600hmov bx, 0700hmov cx, 0mov dx, 0184fhint 10h; ======== 设置焦点mov ax, 0200hmov bx, 0000hmov dx, 0000hint 10h; ======== 在屏幕上显示 Start Booting.</description>
+    </item>
+    
+    <item>
+      <title></title>
       <link>https://os-dev.incolore.net/posts/bochs-%E8%B0%83%E8%AF%95%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       

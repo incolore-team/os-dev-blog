@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" dir=>
+
+<head>
+  <meta name="generator" content="Hugo 0.80.0" />
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="下载 Bochs#访问 Bochs x86 PC emulator - Browse /bochs at SourceForge.net。
+找到最新版：
+我们要编译安装，所以下载 bochs-2.6.11.tar.gz
+下载之后是存放在 Windows 上的（当然，你也可以直接在 Ubuntu 中打开 Firefox 浏览器下载），我们直接用 VSCode 传输到 Ubuntu 中。
+传输源代码到 Linux 中#在 VSCode 打开终端（Ctrl&#43;Shift&#43;~），在 ~ 下创建 dev 目录：
+打开这个目录：
+然后将文件从 Windows 资源管理器直接拖进来就行：
+执行：
+pluvet@localos:~/dev$ tar -zvxf bochs-2.6.11.tar.gz 进行解压。
+进入解压到的目录
+pluvet@localos:~/dev$ cd bochs-2.6.11/ 编译安装#以防万一，请先执行：
+sudo apt install libx11-devsudo apt install xorg-dev编辑 bx_debug/dbg_main.cpp，变更如下：
+Description: Fix the build with SMP enabled Origin: https://sourceforge.">
+<meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
+<meta property="og:description" content="下载 Bochs#访问 Bochs x86 PC emulator - Browse /bochs at SourceForge.net。
+找到最新版：
+我们要编译安装，所以下载 bochs-2.6.11.tar.gz
+下载之后是存放在 Windows 上的（当然，你也可以直接在 Ubuntu 中打开 Firefox 浏览器下载），我们直接用 VSCode 传输到 Ubuntu 中。
+传输源代码到 Linux 中#在 VSCode 打开终端（Ctrl&#43;Shift&#43;~），在 ~ 下创建 dev 目录：
+打开这个目录：
+然后将文件从 Windows 资源管理器直接拖进来就行：
+执行：
+pluvet@localos:~/dev$ tar -zvxf bochs-2.6.11.tar.gz 进行解压。
+进入解压到的目录
+pluvet@localos:~/dev$ cd bochs-2.6.11/ 编译安装#以防万一，请先执行：
+sudo apt install libx11-devsudo apt install xorg-dev编辑 bx_debug/dbg_main.cpp，变更如下：
+Description: Fix the build with SMP enabled Origin: https://sourceforge." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://os-dev.incolore.net/docs/1.6-%E5%9C%A8-ubuntu-%E4%B8%AD%E5%AE%89%E8%A3%85-bochs-%E8%99%9A%E6%8B%9F%E6%9C%BA/" />
+
+<title>1.6 在 Ubuntu 中安装 Bochs 虚拟机 | 操作系统开发</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/book.min.134b70e5316650a530cb42e4e8630b2a01d532bebfc0337028211175336e4806.css" integrity="sha256-E0tw5TFmUKUwy0Lk6GMLKgHVMr6/wDNwKCERdTNuSAY=">
+<script defer src="/en.search.min.27d508dae658a85a6295c9c43987cc900e59f8545e80ab0efc918243697e3128.js" integrity="sha256-J9UI2uZYqFpilcnEOYfMkA5Z&#43;FRegKsO/JGCQ2l&#43;MSg="></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body dir=>
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/"><span>操作系统开发</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li>1. 开发环境搭建
+<ul>
+<li><a href="/docs/1.1-virtualbox-%E7%9A%84%E5%AE%89%E8%A3%85/">1.1 VirtualBox 的安装</a></li>
+<li><a href="/docs/1.2-%E5%9C%A8-virtualbox-%E5%AE%89%E8%A3%85-ubuntu-%E7%B3%BB%E7%BB%9F/">1.2 在 VirtualBox 安装 Ubuntu 系统</a></li>
+<li><a href="/docs/1.3-%E4%B8%BA-ubuntu-%E8%A7%A3%E9%99%A4%E7%BD%91%E7%BB%9C%E5%B0%81%E9%94%81/">1.3 为 Ubuntu 解除网络封锁</a></li>
+<li><a href="/docs/1.4-%E4%B8%BA-ubuntu-%E5%AE%89%E8%A3%85%E5%A2%9E%E5%BC%BA%E5%8A%9F%E8%83%BD/">1.4 为 Ubuntu 安装增强功能</a></li>
+<li><a href="/docs/1.5-%E4%B8%BA-ubuntu-%E9%85%8D%E7%BD%AE-ssh-%E8%BF%9E%E6%8E%A5%E5%B9%B6%E5%AF%B9%E6%8E%A5-vscode/">1.5 为 Ubuntu 配置 SSH 连接并对接 VSCode</a></li>
+</ul>
+</li>
+<li>2. 引导原理与引导程序
+<ul>
+<li><a href="/docs/2.1-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/">2.1 第一个引导程序</a></li>
+</ul>
+</li>
+<li><a href="/posts/">Blog</a>
+<ul>
+<li><a href="/posts/%E4%B8%BB%E8%A6%81%E5%8F%82%E8%80%83/">主要参考</a></li>
+<li><a href="/posts/windows-%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C/">Windows 基础操作</a></li>
+<li><a href="/posts/git-%E9%80%9F%E6%88%90%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/">Git 速成入门指南</a></li>
+<li><a href="/posts/bochs-%E8%B0%83%E8%AF%95%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">Bochs 调试常用命令</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>1.6 在 Ubuntu 中安装 Bochs 虚拟机</strong>
+
+  <label for="toc-control">
+    
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#下载-bochs">下载 Bochs</a></li>
+    <li><a href="#传输源代码到-linux-中">传输源代码到 Linux 中</a></li>
+    <li><a href="#编译安装">编译安装</a></li>
+    <li><a href="#创建-bochs-虚拟机配置文件">创建 Bochs 虚拟机配置文件</a></li>
+  </ul>
+</nav>
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h2 id="下载-bochs">
+  下载 Bochs
+  <a class="anchor" href="#%e4%b8%8b%e8%bd%bd-bochs">#</a>
+</h2>
+<p>访问 <a href="https://sourceforge.net/projects/bochs/files/bochs/">Bochs x86 PC emulator - Browse /bochs at SourceForge.net</a>。</p>
+<p>找到最新版：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205231805195.png" alt="image-20210205231805195" /></p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205231831486.png" alt="image-20210205231831486" /></p>
+<p>我们要编译安装，所以下载 <a href="https://sourceforge.net/projects/bochs/files/bochs/2.6.11/bochs-2.6.11.tar.gz/download">bochs-2.6.11.tar.gz</a></p>
+<p>下载之后是存放在 Windows 上的（当然，你也可以直接在 Ubuntu 中打开 Firefox 浏览器下载），我们直接用 VSCode 传输到 Ubuntu 中。</p>
+<h2 id="传输源代码到-linux-中">
+  传输源代码到 Linux 中
+  <a class="anchor" href="#%e4%bc%a0%e8%be%93%e6%ba%90%e4%bb%a3%e7%a0%81%e5%88%b0-linux-%e4%b8%ad">#</a>
+</h2>
+<p>在 VSCode 打开终端（<code>Ctrl+Shift+~</code>），在 <code>~</code> 下创建 <code>dev</code> 目录：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205232149495.png" alt="image-20210205232149495" /></p>
+<p>打开这个目录：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205232310795.png" alt="image-20210205232310795" /></p>
+<p>然后将文件从 Windows 资源管理器直接拖进来就行：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205232334045.png" alt="image-20210205232334045" /></p>
+<p>执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev$ tar -zvxf bochs-2.6.11.tar.gz 
+</code></pre></div><p>进行解压。</p>
+<p>进入解压到的目录</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev$ cd bochs-2.6.11/
+</code></pre></div><h2 id="编译安装">
+  编译安装
+  <a class="anchor" href="#%e7%bc%96%e8%af%91%e5%ae%89%e8%a3%85">#</a>
+</h2>
+<p>以防万一，请先执行：</p>
+<pre><code>sudo apt install libx11-dev
+sudo apt install xorg-dev
+</code></pre><p>编辑 <code>bx_debug/dbg_main.cpp</code>，变更如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">Description: Fix the build with SMP enabled
+Origin: https://sourceforge.net/p/bochs/code/13778/
+
+Index: bochs/bx_debug/dbg_main.cc
+===================================================================
+<span style="color:#f92672">--- bochs/bx_debug/dbg_main.cc	(revision 13777)
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ bochs/bx_debug/dbg_main.cc	(working copy)
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -1494,11 +1494,11 @@
+</span><span style="color:#75715e"></span> {
+   char cpu_param_name[16];
+ 
+<span style="color:#f92672">-  Bit32u index = BX_ITLB_INDEX_OF(laddr);		//这一行改成下面一行
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+  Bit32u index = BX_CPU(dbg_cpu)-&gt;ITLB.get_index_of(laddr);
+</span><span style="color:#a6e22e"></span>   sprintf(cpu_param_name, &#34;ITLB.entry%d&#34;, index);
+   bx_dbg_show_param_command(cpu_param_name, 0);
+ 
+<span style="color:#f92672">-  index = BX_DTLB_INDEX_OF(laddr, 0);		//同理
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+  index = BX_CPU(dbg_cpu)-&gt;DTLB.get_index_of(laddr);
+</span><span style="color:#a6e22e"></span>   sprintf(cpu_param_name, &#34;DTLB.entry%d&#34;, index);
+   bx_dbg_show_param_command(cpu_param_name, 0);
+ }
+</code></pre></div><p>再执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">cp misc/bximage.cpp misc/bximage.cc
+cp iodev/hdimage/hdimage.cpp iodev/hdimage/hdimage.cc
+cp iodev/hdimage/vmware3.cpp iodev/hdimage/vmware3.cc
+cp iodev/hdimage/vmware4.cpp iodev/hdimage/vmware4.cc
+cp iodev/hdimage/vpc-img.cpp iodev/hdimage/vpc-img.cc
+cp iodev/hdimage/vbox.cpp iodev/hdimage/vbox.cc
+</code></pre></div><p>以上是为了避免你之后遇到各种 bug。</p>
+<p>为了知道如何安装，我们看一下 <a href="http://bochs.sourceforge.net/cgi-bin/topper.pl?name=New&#43;Bochs&#43;Documentation&amp;url=http://bochs.sourceforge.net/doc/docbook">bochs: The Open Source IA-32 Emulation Project (New Bochs Documentation) (sourceforge.net)</a> 这里的文档。</p>
+<p>我使用的 <code>configure</code> 指令如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev/bochs-2.6.11$ ./configure --with-x11 --with-wx --enable-debugger --enable-disasm --enable-all-optimizations --enable-readline --enable-long-phy-address --enable-ltdl-install --enable-idle-hack --enable-plugins --enable-a20-pin --enable-x86-64 --enable-smp --enable-cpu-level<span style="color:#f92672">=</span><span style="color:#ae81ff">6</span> --enable-large-ramfile --enable-repeat-speedups --enable-fast-function-calls  --enable-handlers-chaining  --enable-trace-linking --enable-configurable-msrs --enable-show-ips --enable-cpp --enable-debugger-gui --enable-iodebug --enable-logging --enable-assert-checks --enable-fpu --enable-vmx<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> --enable-svm --enable-3dnow --enable-alignment-check  --enable-monitor-mwait --enable-avx  --enable-evex --enable-x86-debugger --enable-pci --enable-usb
+</code></pre></div><p>执行后会看到一系列的 checking 操作。</p>
+<p>正常情况结尾应该是类似这样：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205233810056.png" alt="image-20210205233810056" /></p>
+<p>接下来执行 <code>make</code> 编译：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev/bochs-2.6.11$ make
+</code></pre></div><p>看到很多这样的 warning 不用理会：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205233853961.png" alt="image-20210205233853961" /></p>
+<blockquote>
+<p>如果是 <strong>error</strong> 就得找找原因了。</p>
+</blockquote>
+<p>我这里遇到了如下报错：</p>
+<pre><code>x.cc:37:10: fatal error: X11/Xlib.h: No such file or directory
+   37 | #include &lt;X11/Xlib.h&gt;
+      |          ^~~~~~~~~~~~
+compilation terminated.
+make[1]: *** [Makefile:114: x.o] Error 1
+make[1]: Leaving directory '/home/pluvet/dev/bochs-2.6.11/gui'
+make: *** [Makefile:360: gui/libgui.a] Error 2
+</code></pre><p>谷歌搜索之后，在 SOF 上看到如下解决方案</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo apt install libx11-dev
+sudo apt install xorg-dev
+</code></pre></div><p>根据指示，安装 <code>libx11-dev</code> 包，然后重新 <code>make</code> 。</p>
+<p>此外还遇到如下报错：</p>
+<pre><code>/home/pluvet/dev/bochs-2.6.11/gui/x.cc:1535: undefined reference to `XCreateBitmapFromData'
+/usr/bin/ld: gui/libgui.a(x.o): in function `bx_x_gui_c::palette_change(unsigned char, unsigned char, unsigned char, unsigned char)':
+/home/pluvet/dev/bochs-2.6.11/gui/x.cc:1478: undefined reference to `XStoreColor'
+/usr/bin/ld: /home/pluvet/dev/bochs-2.6.11/gui/x.cc:1482: undefined reference to `XAllocColor'
+</code></pre><p>编译的过程会比较缓慢。成功之后看到的类似这样：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205235535426.png" alt="image-20210205235535426" /></p>
+<p>正式安装，执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev/bochs-2.6.11$ sudo su
+root@localos:/home/pluvet/dev/bochs-2.6.11# make install
+</code></pre></div><p>成功之后看到的类似这样：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205235627989.png" alt="image-20210205235627989" /></p>
+<p>执行</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">root@localos:/home/pluvet/dev/bochs-2.6.11# exit
+</code></pre></div><p>退出 root 用户。</p>
+<h2 id="创建-bochs-虚拟机配置文件">
+  创建 Bochs 虚拟机配置文件
+  <a class="anchor" href="#%e5%88%9b%e5%bb%ba-bochs-%e8%99%9a%e6%8b%9f%e6%9c%ba%e9%85%8d%e7%bd%ae%e6%96%87%e4%bb%b6">#</a>
+</h2>
+<p>在 <code>bochs-xxx</code> 文件夹中，有一个示例配置文件 <code>.bochsrc</code>，我们将其复制到 <code>~/dev/vm</code> 目录：‘</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev$ mkdir vm
+pluvet@localos:~/dev$ mv bochs-2.6.11/.bochsrc vm
+</code></pre></div><p>编辑这个配置文件，内容如下：</p>
+<pre><code># configuration file generated by Bochs
+plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, iodebug=1
+config_interface: textconfig
+display_library: x
+#memory: host=2048, guest=2048
+romimage: file=&quot;/usr/local/share/bochs/BIOS-bochs-latest&quot;
+vgaromimage: file=&quot;/usr/local/share/bochs/VGABIOS-lgpl-latest&quot;
+boot: floppy
+floppy_bootsig_check: disabled=0
+floppya: type=1_44, 1_44=&quot;boot.img&quot;, status=inserted, write_protected=0
+# no floppyb
+ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+ata0-master: type=none
+ata0-slave: type=none
+ata1: enabled=1, ioaddr1=0x170, ioaddr2=0x370, irq=15
+ata1-master: type=none
+ata1-slave: type=none
+ata2: enabled=0
+ata3: enabled=0
+pci: enabled=1, chipset=i440fx
+vga: extension=vbe, update_freq=5
+
+cpu: count=1:1:1, ips=4000000, quantum=16, model=corei7_haswell_4770, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0, msrs=&quot;msrs.def&quot;
+
+cpuid: x86_64=1,level=6, mmx=1, sep=1, simd=avx512, aes=1, movbe=1, xsave=1,apic=x2apic,sha=1,movbe=1,adx=1,xsaveopt=1,avx_f16c=1,avx_fma=1,bmi=bmi2,1g_pages=1,pcid=1,fsgsbase=1,smep=1,smap=1,mwait=1,vmx=1
+cpuid: family=6, model=0x1a, stepping=5, vendor_string=&quot;GenuineIntel&quot;, brand_string=&quot;Intel(R) Core(TM) i7-4770 CPU (Haswell)&quot;
+
+print_timestamps: enabled=0
+debugger_log: -
+magic_break: enabled=0
+port_e9_hack: enabled=0
+private_colormap: enabled=0
+clock: sync=none, time0=local, rtc_sync=0
+# no cmosimage
+# no loader
+log: -
+logprefix: %t%e%d
+debug: action=ignore
+info: action=report
+error: action=report
+panic: action=ask
+keyboard: type=mf, serial_delay=250, paste_delay=100000, user_shortcut=none
+mouse: type=ps2, enabled=0, toggle=ctrl+mbutton
+speaker: enabled=1, mode=system
+parport1: enabled=1, file=none
+parport2: enabled=0
+com1: enabled=1, mode=null
+com2: enabled=0
+com3: enabled=0
+com4: enabled=0
+
+megs: 2048
+
+</code></pre><p>执行</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev/vm$  bochs -help cpu
+</code></pre></div><p>可以查看支持模拟的 CPU。</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#下载-bochs">下载 Bochs</a></li>
+    <li><a href="#传输源代码到-linux-中">传输源代码到 Linux 中</a></li>
+    <li><a href="#编译安装">编译安装</a></li>
+    <li><a href="#创建-bochs-虚拟机配置文件">创建 Bochs 虚拟机配置文件</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
