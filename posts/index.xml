@@ -23,6 +23,27 @@
     
     <item>
       <title></title>
+      <link>https://os-dev.incolore.net/posts/bochs-%E8%B0%83%E8%AF%95%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://os-dev.incolore.net/posts/bochs-%E8%B0%83%E8%AF%95%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid>
+      <description>转载自：Bochs调试常用命令 | Ney的技术博客 (petpwiuta.github.io)
+1 简介#Bochs是做系统开发常用的虚拟机，调试系统内核很方便。
+安装Bochs一般是从源码编译再安装，而调试器属于可选功能，所以在编译Bochs时需要使用--enable-debugger和--enable-disasm标志开启调试模块。例如：
+./configure --enable-debugger --enable-disasm #后面还有其他选项，此处省略需要注意调试功能在 2.5.4 版本以上才有，确保下载的代码是高于这个版本的。
+2 常见的几个使用场景#2.1 查看寄存器#汇编代码中，调试最常用的功能就是查看寄存器的内容。
+ r 查看通用寄存器 sreg 查看段寄存器 creg 查看控制寄存器 dreg 查看调试寄存器 info cpu 查看所有寄存器  2.2 查找和定位代码#次常用的肯定是控制代码执行流程，代码执行到想要仔细跟踪的那个部分。
+  b 内存地址 设置断点
+如b 0x7c00，在线性地址0x7c00处设置断点。
+  info break 查看设置过的断点
+  c 继续执行代码
+一般设置断点后，想让代码恢复执行，就使用这个命令。
+  s 单步执行
+单步执行一行代码，和高级语言调试器的step into按钮类似，遇到函数调用会跳转到函数内部执行。单步执行命令也可以带参数，指定执行的次数，如 s 100 就是单步执行100次。</description>
+    </item>
+    
+    <item>
+      <title></title>
       <link>https://os-dev.incolore.net/posts/git-%E9%80%9F%E6%88%90%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
