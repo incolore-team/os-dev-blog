@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="什么是 BIOS#BIOS 就是内置在主板上的一个程序，当系统启动时，会执行 BIOS 中的代码，进行设备检查（称为自检）等等。当检查通过之后，会读取 启动设备 中的引导程序，从而将操作系统加载到内存运行。
-什么是引导程序#引导程序就是讲操作系统加载到内存，运行整个操作系统的程序。
+什么是引导程序#引导程序就是把操作系统加载到内存，带动运行操作系统的程序。
 BIOS 如何执行引导程序#BIOS 会读取启动设备的前 512B（B 是字节单位，Byte），这些字节是设备的第一个扇区，如果这个扇区的结束字节是 0x55, 0xaa 则表示这个扇区是可引导扇区，这些字节称为（即主引导记录（master boot record，MBR）），将这一块加载到物理内存（具体位置是 0x7c00）中，然后执行其中的二进制代码（这些代码就是引导程序）。
 安装 NASM#NASM 是将汇编代码编译为二进制的工具。安装方式：
 sudo apt install nasm 安装 HexEdit#Hexedit 是一个十六进制编译器。安装：
@@ -14,7 +14,7 @@ sudo apt install hexedit 第一个引导程序#下面，我们用 Intel 汇�
 ; 告知编译器程序的起始位置org 0x7c00BaseOfStack equ 0x7c00Label_Start:mov ax, csmov ds, axmov es, axmov ss, axmov sp, BaseOfStack; ======== 清屏mov ax, 0600hmov bx, 0700hmov cx, 0mov dx, 0184fhint 10h; ======== 设置焦点mov ax, 0200hmov bx, 0000hmov dx, 0000hint 10h; ======== 在屏幕上显示 Start Booting.">
 <meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
 <meta property="og:description" content="什么是 BIOS#BIOS 就是内置在主板上的一个程序，当系统启动时，会执行 BIOS 中的代码，进行设备检查（称为自检）等等。当检查通过之后，会读取 启动设备 中的引导程序，从而将操作系统加载到内存运行。
-什么是引导程序#引导程序就是讲操作系统加载到内存，运行整个操作系统的程序。
+什么是引导程序#引导程序就是把操作系统加载到内存，带动运行操作系统的程序。
 BIOS 如何执行引导程序#BIOS 会读取启动设备的前 512B（B 是字节单位，Byte），这些字节是设备的第一个扇区，如果这个扇区的结束字节是 0x55, 0xaa 则表示这个扇区是可引导扇区，这些字节称为（即主引导记录（master boot record，MBR）），将这一块加载到物理内存（具体位置是 0x7c00）中，然后执行其中的二进制代码（这些代码就是引导程序）。
 安装 NASM#NASM 是将汇编代码编译为二进制的工具。安装方式：
 sudo apt install nasm 安装 HexEdit#Hexedit 是一个十六进制编译器。安装：
@@ -27,7 +27,7 @@ sudo apt install hexedit 第一个引导程序#下面，我们用 Intel 汇�
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.134b70e5316650a530cb42e4e8630b2a01d532bebfc0337028211175336e4806.css" integrity="sha256-E0tw5TFmUKUwy0Lk6GMLKgHVMr6/wDNwKCERdTNuSAY=">
-<script defer src="/en.search.min.27d508dae658a85a6295c9c43987cc900e59f8545e80ab0efc918243697e3128.js" integrity="sha256-J9UI2uZYqFpilcnEOYfMkA5Z&#43;FRegKsO/JGCQ2l&#43;MSg="></script>
+<script defer src="/en.search.min.e493ad7e5caa6d89f51756fec1f056ec1e39153fbb726630200a77b32cb485b6.js" integrity="sha256-5JOtflyqbYn1F1b&#43;wfBW7B45FT&#43;7cmYwIAp3syy0hbY="></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -159,7 +159,7 @@ https://github.com/alex-shpak/hugo-book
   什么是引导程序
   <a class="anchor" href="#%e4%bb%80%e4%b9%88%e6%98%af%e5%bc%95%e5%af%bc%e7%a8%8b%e5%ba%8f">#</a>
 </h2>
-<p>引导程序就是讲操作系统加载到内存，运行整个操作系统的程序。</p>
+<p>引导程序就是把操作系统加载到内存，带动运行操作系统的程序。</p>
 <h2 id="bios-如何执行引导程序">
   BIOS 如何执行引导程序
   <a class="anchor" href="#bios-%e5%a6%82%e4%bd%95%e6%89%a7%e8%a1%8c%e5%bc%95%e5%af%bc%e7%a8%8b%e5%ba%8f">#</a>
@@ -267,7 +267,8 @@ dw      0xaa55
 000001D0   00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  ................
 000001E0   00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  ................
 000001F0   00 00 00 00  00 00 00 00  00 00 00 00  00 00 55 AA  ..............U.
-</code></pre><p>可以发现前面是我们的代码，中间 <code>0</code> 填充，最后是扇区标志 <code>55AA</code> 按 <em>Ctrl+X</em> 退出。</p>
+</code></pre><p>可以发现前面是我们的代码，中间 <code>0</code> 填充，最后是扇区标志 <code>55AA</code></p>
+<p>按 <em>Ctrl+X</em> 退出 HexEdit。</p>
 <blockquote>
 <p>为什么汇编代码中是 0xaa55，而这里是 55AA 呢？请阅读 <em>CSAPP</em> 大端序、小端序的相关章节。</p>
 </blockquote>
@@ -279,13 +280,13 @@ dw      0xaa55
 </code></pre></div><p>执行下列指令运行虚拟机：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev/vm$ bochs -f ./.bochsrc
 </code></pre></div><p>下列界面回车：</p>
-<p>![image-20210206153513311](A:\Project\osdev\blog\os-dev\web\content\docs\2.1 引导原理与引导程序.assets\image-20210206153513311.png)</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210206153513311.png" alt="image-20210206153513311" /></p>
 <p>之后会黑屏：</p>
-<p>![image-20210206153532680](A:\Project\osdev\blog\os-dev\web\content\docs\2.1 引导原理与引导程序.assets\image-20210206153532680.png)</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210206153532680.png" alt="image-20210206153532680" /></p>
 <p>切换到 bochs 控制台窗口，执行 <code>c</code> （表示 Continue）：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">&lt;bochs:1&gt; c
 </code></pre></div><p>成功结果如下：</p>
-<p>![image-20210206153648371](A:\Project\osdev\blog\os-dev\web\content\docs\2.1 引导原理与引导程序.assets\image-20210206153648371.png)</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210206153648371.png" alt="image-20210206153648371" /></p>
 <p>在bochs 控制台窗口，按下 Ctrl+C 可以中止虚拟机的运行。然后执行 <code>exit</code> 退出：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">&lt;bochs:1&gt; exit
 </code></pre></div></article>
