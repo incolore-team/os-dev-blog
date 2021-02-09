@@ -16,8 +16,7 @@
 pluvet@localos:~/dev$ tar -zvxf bochs-2.6.11.tar.gz 进行解压。
 进入解压到的目录
 pluvet@localos:~/dev$ cd bochs-2.6.11/ 编译安装#以防万一，请先执行：
-sudo apt install libx11-devsudo apt install xorg-dev编辑 bx_debug/dbg_main.cpp，变更如下：
-Description: Fix the build with SMP enabled Origin: https://sourceforge.">
+sudo apt install libx11-devsudo apt install xorg-dev为了知道如何安装，我们看一下 bochs: The Open Source IA-32 Emulation Project (New Bochs Documentation) (sourceforge.">
 <meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
 <meta property="og:description" content="下载 Bochs#访问 Bochs x86 PC emulator - Browse /bochs at SourceForge.net。
 找到最新版：
@@ -30,8 +29,7 @@ Description: Fix the build with SMP enabled Origin: https://sourceforge.">
 pluvet@localos:~/dev$ tar -zvxf bochs-2.6.11.tar.gz 进行解压。
 进入解压到的目录
 pluvet@localos:~/dev$ cd bochs-2.6.11/ 编译安装#以防万一，请先执行：
-sudo apt install libx11-devsudo apt install xorg-dev编辑 bx_debug/dbg_main.cpp，变更如下：
-Description: Fix the build with SMP enabled Origin: https://sourceforge." />
+sudo apt install libx11-devsudo apt install xorg-dev为了知道如何安装，我们看一下 bochs: The Open Source IA-32 Emulation Project (New Bochs Documentation) (sourceforge." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://os-dev.incolore.net/docs/1.6-%E5%9C%A8-ubuntu-%E4%B8%AD%E5%AE%89%E8%A3%85-bochs-%E8%99%9A%E6%8B%9F%E6%9C%BA/" />
 
@@ -39,7 +37,7 @@ Description: Fix the build with SMP enabled Origin: https://sourceforge." />
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.134b70e5316650a530cb42e4e8630b2a01d532bebfc0337028211175336e4806.css" integrity="sha256-E0tw5TFmUKUwy0Lk6GMLKgHVMr6/wDNwKCERdTNuSAY=">
-<script defer src="/en.search.min.e493ad7e5caa6d89f51756fec1f056ec1e39153fbb726630200a77b32cb485b6.js" integrity="sha256-5JOtflyqbYn1F1b&#43;wfBW7B45FT&#43;7cmYwIAp3syy0hbY="></script>
+<script defer src="/en.search.min.e233c31c305cfe46fd9f3a80eee6980e4fa16353f3e146decb7b494475b2a18e.js" integrity="sha256-4jPDHDBc/kb9nzqA7uaYDk&#43;hY1Pz4Ubey3tJRHWyoY4="></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -91,6 +89,7 @@ https://github.com/alex-shpak/hugo-book
 <li>2. 引导原理与引导程序
 <ul>
 <li><a href="/docs/2.1-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/">2.1 第一个引导程序</a></li>
+<li><a href="/docs/2.2-fat-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">2.2 FAT 文件系统</a></li>
 </ul>
 </li>
 <li><a href="/posts/">Blog</a>
@@ -193,7 +192,13 @@ https://github.com/alex-shpak/hugo-book
 <p>以防万一，请先执行：</p>
 <pre><code>sudo apt install libx11-dev
 sudo apt install xorg-dev
-</code></pre><p>编辑 <code>bx_debug/dbg_main.cpp</code>，变更如下：</p>
+</code></pre><p>为了知道如何安装，我们看一下 <a href="http://bochs.sourceforge.net/cgi-bin/topper.pl?name=New&#43;Bochs&#43;Documentation&amp;url=http://bochs.sourceforge.net/doc/docbook">bochs: The Open Source IA-32 Emulation Project (New Bochs Documentation) (sourceforge.net)</a> 这里的文档。</p>
+<p>我使用的 <code>configure</code> 指令如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev/bochs-2.6.11$ ./configure --with-x11 --with-wx --enable-debugger --enable-disasm --enable-all-optimizations --enable-readline --enable-long-phy-address --enable-ltdl-install --enable-idle-hack --enable-plugins --enable-a20-pin --enable-x86-64 --enable-smp --enable-cpu-level<span style="color:#f92672">=</span><span style="color:#ae81ff">6</span> --enable-large-ramfile --enable-repeat-speedups --enable-fast-function-calls  --enable-handlers-chaining  --enable-trace-linking --enable-configurable-msrs --enable-show-ips --enable-cpp --enable-debugger-gui --enable-iodebug --enable-logging --enable-assert-checks --enable-fpu --enable-vmx<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> --enable-svm --enable-3dnow --enable-alignment-check  --enable-monitor-mwait --enable-avx  --enable-evex --enable-x86-debugger --enable-pci --enable-usb
+</code></pre></div><p>执行后会看到一系列的 checking 操作。</p>
+<p>正常情况结尾应该是类似这样：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205233810056.png" alt="image-20210205233810056" /></p>
+<p>编辑 <code>bx_debug/dbg_main.cpp</code>，变更如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">Description: Fix the build with SMP enabled
 Origin: https://sourceforge.net/p/bochs/code/13778/
 
@@ -223,12 +228,6 @@ cp iodev/hdimage/vmware4.cpp iodev/hdimage/vmware4.cc
 cp iodev/hdimage/vpc-img.cpp iodev/hdimage/vpc-img.cc
 cp iodev/hdimage/vbox.cpp iodev/hdimage/vbox.cc
 </code></pre></div><p>以上是为了避免你之后遇到各种 bug。</p>
-<p>为了知道如何安装，我们看一下 <a href="http://bochs.sourceforge.net/cgi-bin/topper.pl?name=New&#43;Bochs&#43;Documentation&amp;url=http://bochs.sourceforge.net/doc/docbook">bochs: The Open Source IA-32 Emulation Project (New Bochs Documentation) (sourceforge.net)</a> 这里的文档。</p>
-<p>我使用的 <code>configure</code> 指令如下：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev/bochs-2.6.11$ ./configure --with-x11 --with-wx --enable-debugger --enable-disasm --enable-all-optimizations --enable-readline --enable-long-phy-address --enable-ltdl-install --enable-idle-hack --enable-plugins --enable-a20-pin --enable-x86-64 --enable-smp --enable-cpu-level<span style="color:#f92672">=</span><span style="color:#ae81ff">6</span> --enable-large-ramfile --enable-repeat-speedups --enable-fast-function-calls  --enable-handlers-chaining  --enable-trace-linking --enable-configurable-msrs --enable-show-ips --enable-cpp --enable-debugger-gui --enable-iodebug --enable-logging --enable-assert-checks --enable-fpu --enable-vmx<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> --enable-svm --enable-3dnow --enable-alignment-check  --enable-monitor-mwait --enable-avx  --enable-evex --enable-x86-debugger --enable-pci --enable-usb
-</code></pre></div><p>执行后会看到一系列的 checking 操作。</p>
-<p>正常情况结尾应该是类似这样：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/20210125/image-20210205233810056.png" alt="image-20210205233810056" /></p>
 <p>接下来执行 <code>make</code> 编译：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pluvet@localos:~/dev/bochs-2.6.11$ make
 </code></pre></div><p>看到很多这样的 warning 不用理会：</p>

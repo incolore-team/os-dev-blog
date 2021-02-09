@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en" dir=>
+
+<head>
+  <meta name="generator" content="Hugo 0.80.0" />
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="硬盘的结构和原理#物理结构#历史上的机械硬盘，很像是层层叠起的光盘。虽然如今已经有固态硬盘等更快的存储设备，但是对文件系统进行抽象设计时，我们依旧沿用这些老的概念。
+你可以观看这个视频 【回形针PaperClip】你的硬盘是如何储存数据的？ 获得一些基础知识。
+磁头（head）：可以读写磁盘表面的磁向。每个盘面有一个磁头，它极其贴近地悬浮在盘面上，但是绝对不与盘面接触，否则会损坏磁头和盘面；
+磁道（track）：磁道是单个盘面上的同心圆，当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道，一个盘面上的磁道可以有成千上万个。相邻磁道之间并不是紧挨着的，这是因为磁化单元相隔太近时磁性会产生相互影响，同时也为磁头的读写带来困难。
+柱面（cylinder）：在有多个盘片构成的盘组中，由不同盘片的面，但处于同一半径圆的多个磁道组成的一个圆柱面。
+扇区（sector）：磁盘上的每个磁道被等分为若干个弧段，这些弧段便是硬盘的扇区（Sector）。硬盘的第一个扇区，叫做引导扇区。扇区是被间隙（gap）分割的圆的片段，间隙未被磁化成0或者1。注意，扇区是读写磁盘最基本的单位，如果一个扇区因为某种原因被破坏，那么整个扇区的数据都会受影响。
+电脑通过观察磁头接收到的感应电流的方向判断数据是 0 还是 1。通过磁头施加磁场后，对磁介质的磁化作用改变数据的内容。
+抽象结构#以 Linux 系统为例，假设你买了一个 500G 硬盘和一个 32G U 盘，则在系统中被认作磁盘 sda 和 sdb。
+经过格式化，把 sda 格式化为物理分区（物理卷），得到 sda1（500G）。把 sdb 格式化为两个 物理分区（物理卷），得到 sdb1（4G） 和 sdb2（28G，注意，这个容量分配是人决定的）。
+sda1, sdb1 和 sdb2 可以共同构成 卷组。
+可以在 卷组 上进行逻辑分区，得到逻辑卷 1 和逻辑卷 2.
+硬盘的寻址方式#寻址就是要读写的数据的位置进行确定。分为 CHS 寻址和 LBA 寻址。
+CHS 寻址：将硬盘划分为柱面(Cylinder)、磁头（Heads）、扇区(Sector)。使用具体的这三个数据值（物理地址）去寻找对应位置的数据。
+LBA 寻址：地址不再表示实际硬盘的实际物理地址（柱面、磁头和扇区），而是使用逻辑地址。LBA编址方式将 CHS 这种三维寻址方式转变为一维的线性寻址，把扇区依次编号，通过编号找到对应的扇区，这样就只需要一个参数。
+文件系统的基本概念#数据单元#对硬盘进行一次读写操作的最小数据量，称为一个数据单元。在 FAT 和 NTFS 文件系统中称作“簇(Cluster)”， ExtX 文件系统中称作“块(Block)”。">
+<meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
+<meta property="og:description" content="硬盘的结构和原理#物理结构#历史上的机械硬盘，很像是层层叠起的光盘。虽然如今已经有固态硬盘等更快的存储设备，但是对文件系统进行抽象设计时，我们依旧沿用这些老的概念。
+你可以观看这个视频 【回形针PaperClip】你的硬盘是如何储存数据的？ 获得一些基础知识。
+磁头（head）：可以读写磁盘表面的磁向。每个盘面有一个磁头，它极其贴近地悬浮在盘面上，但是绝对不与盘面接触，否则会损坏磁头和盘面；
+磁道（track）：磁道是单个盘面上的同心圆，当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道，一个盘面上的磁道可以有成千上万个。相邻磁道之间并不是紧挨着的，这是因为磁化单元相隔太近时磁性会产生相互影响，同时也为磁头的读写带来困难。
+柱面（cylinder）：在有多个盘片构成的盘组中，由不同盘片的面，但处于同一半径圆的多个磁道组成的一个圆柱面。
+扇区（sector）：磁盘上的每个磁道被等分为若干个弧段，这些弧段便是硬盘的扇区（Sector）。硬盘的第一个扇区，叫做引导扇区。扇区是被间隙（gap）分割的圆的片段，间隙未被磁化成0或者1。注意，扇区是读写磁盘最基本的单位，如果一个扇区因为某种原因被破坏，那么整个扇区的数据都会受影响。
+电脑通过观察磁头接收到的感应电流的方向判断数据是 0 还是 1。通过磁头施加磁场后，对磁介质的磁化作用改变数据的内容。
+抽象结构#以 Linux 系统为例，假设你买了一个 500G 硬盘和一个 32G U 盘，则在系统中被认作磁盘 sda 和 sdb。
+经过格式化，把 sda 格式化为物理分区（物理卷），得到 sda1（500G）。把 sdb 格式化为两个 物理分区（物理卷），得到 sdb1（4G） 和 sdb2（28G，注意，这个容量分配是人决定的）。
+sda1, sdb1 和 sdb2 可以共同构成 卷组。
+可以在 卷组 上进行逻辑分区，得到逻辑卷 1 和逻辑卷 2.
+硬盘的寻址方式#寻址就是要读写的数据的位置进行确定。分为 CHS 寻址和 LBA 寻址。
+CHS 寻址：将硬盘划分为柱面(Cylinder)、磁头（Heads）、扇区(Sector)。使用具体的这三个数据值（物理地址）去寻找对应位置的数据。
+LBA 寻址：地址不再表示实际硬盘的实际物理地址（柱面、磁头和扇区），而是使用逻辑地址。LBA编址方式将 CHS 这种三维寻址方式转变为一维的线性寻址，把扇区依次编号，通过编号找到对应的扇区，这样就只需要一个参数。
+文件系统的基本概念#数据单元#对硬盘进行一次读写操作的最小数据量，称为一个数据单元。在 FAT 和 NTFS 文件系统中称作“簇(Cluster)”， ExtX 文件系统中称作“块(Block)”。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://os-dev.incolore.net/docs/2.2-fat-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" />
+
+<title>2.2 F a T 文件系统 | 操作系统开发</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/book.min.134b70e5316650a530cb42e4e8630b2a01d532bebfc0337028211175336e4806.css" integrity="sha256-E0tw5TFmUKUwy0Lk6GMLKgHVMr6/wDNwKCERdTNuSAY=">
+<script defer src="/en.search.min.e233c31c305cfe46fd9f3a80eee6980e4fa16353f3e146decb7b494475b2a18e.js" integrity="sha256-4jPDHDBc/kb9nzqA7uaYDk&#43;hY1Pz4Ubey3tJRHWyoY4="></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body dir=>
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/"><span>操作系统开发</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li>1. 开发环境搭建
+<ul>
+<li><a href="/docs/1.1-virtualbox-%E7%9A%84%E5%AE%89%E8%A3%85/">1.1 VirtualBox 的安装</a></li>
+<li><a href="/docs/1.2-%E5%9C%A8-virtualbox-%E5%AE%89%E8%A3%85-ubuntu-%E7%B3%BB%E7%BB%9F/">1.2 在 VirtualBox 安装 Ubuntu 系统</a></li>
+<li><a href="/docs/1.3-%E4%B8%BA-ubuntu-%E8%A7%A3%E9%99%A4%E7%BD%91%E7%BB%9C%E5%B0%81%E9%94%81/">1.3 为 Ubuntu 解除网络封锁</a></li>
+<li><a href="/docs/1.4-%E4%B8%BA-ubuntu-%E5%AE%89%E8%A3%85%E5%A2%9E%E5%BC%BA%E5%8A%9F%E8%83%BD/">1.4 为 Ubuntu 安装增强功能</a></li>
+<li><a href="/docs/1.5-%E4%B8%BA-ubuntu-%E9%85%8D%E7%BD%AE-ssh-%E8%BF%9E%E6%8E%A5%E5%B9%B6%E5%AF%B9%E6%8E%A5-vscode/">1.5 为 Ubuntu 配置 SSH 连接并对接 VSCode</a></li>
+<li><a href="/docs/1.6-%E5%9C%A8-ubuntu-%E4%B8%AD%E5%AE%89%E8%A3%85-bochs-%E8%99%9A%E6%8B%9F%E6%9C%BA/">1.6 在 Ubuntu 中安装 Bochs 虚拟机</a></li>
+</ul>
+</li>
+<li>2. 引导原理与引导程序
+<ul>
+<li><a href="/docs/2.1-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/">2.1 第一个引导程序</a></li>
+<li><a href="/docs/2.2-fat-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/"class=active>2.2 FAT 文件系统</a></li>
+</ul>
+</li>
+<li><a href="/posts/">Blog</a>
+<ul>
+<li><a href="/posts/%E4%B8%BB%E8%A6%81%E5%8F%82%E8%80%83/">主要参考</a></li>
+<li><a href="/posts/windows-%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C/">Windows 基础操作</a></li>
+<li><a href="/posts/git-%E9%80%9F%E6%88%90%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/">Git 速成入门指南</a></li>
+<li><a href="/posts/bochs-%E8%B0%83%E8%AF%95%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">Bochs 调试常用命令</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>2.2 F a T 文件系统</strong>
+
+  <label for="toc-control">
+    
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#硬盘的结构和原理">硬盘的结构和原理</a>
+      <ul>
+        <li><a href="#物理结构">物理结构</a></li>
+        <li><a href="#抽象结构">抽象结构</a></li>
+      </ul>
+    </li>
+    <li><a href="#硬盘的寻址方式">硬盘的寻址方式</a></li>
+    <li><a href="#文件系统的基本概念">文件系统的基本概念</a>
+      <ul>
+        <li><a href="#数据单元">数据单元</a></li>
+        <li><a href="#逻辑文件地址">逻辑文件地址</a></li>
+        <li><a href="#分配策略">分配策略</a></li>
+        <li><a href="#元数据">元数据</a></li>
+      </ul>
+    </li>
+    <li><a href="#fat-文件系统">FAT 文件系统</a>
+      <ul>
+        <li><a href="#fat-的数据单元">FAT 的数据单元</a></li>
+        <li><a href="#fat-的整体布局">FAT 的整体布局</a></li>
+        <li><a href="#引导扇区boot-sector">引导扇区（Boot Sector）</a></li>
+      </ul>
+    </li>
+    <li><a href="#fat-表的特性">FAT 表的特性</a>
+      <ul>
+        <li><a href="#fat-表项填写规则">FAT 表项填写规则</a></li>
+        <li><a href="#fat-表的使用">FAT 表的使用</a></li>
+        <li><a href="#读取一个文件的步骤">读取一个文件的步骤</a></li>
+      </ul>
+    </li>
+    <li><a href="#fat32-的数据区">FAT32 的数据区</a>
+      <ul>
+        <li><a href="#根目录">根目录</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h2 id="硬盘的结构和原理">
+  硬盘的结构和原理
+  <a class="anchor" href="#%e7%a1%ac%e7%9b%98%e7%9a%84%e7%bb%93%e6%9e%84%e5%92%8c%e5%8e%9f%e7%90%86">#</a>
+</h2>
+<h3 id="物理结构">
+  物理结构
+  <a class="anchor" href="#%e7%89%a9%e7%90%86%e7%bb%93%e6%9e%84">#</a>
+</h3>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/picgo/nmhnmkhhny.jpeg" alt="磁道 柱面 扇区" /></p>
+<p>历史上的机械硬盘，很像是层层叠起的光盘。虽然如今已经有固态硬盘等更快的存储设备，但是对文件系统进行抽象设计时，我们依旧沿用这些老的概念。</p>
+<p>你可以观看这个视频 <a href="https://www.bilibili.com/video/BV1n4411G7s5/?spm_id_from=333.788.videocard.7">【回形针PaperClip】你的硬盘是如何储存数据的？</a> 获得一些基础知识。</p>
+<p><strong>磁头（head）</strong>：可以读写磁盘表面的磁向。每个盘面有一个磁头，它极其贴近地悬浮在盘面上，但是绝对不与盘面接触，否则会损坏磁头和盘面；</p>
+<p><strong>磁道（track）</strong>：磁道是单个盘面上的同心圆，当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道，一个盘面上的磁道可以有成千上万个。相邻磁道之间并不是紧挨着的，这是因为磁化单元相隔太近时磁性会产生相互影响，同时也为磁头的读写带来困难。</p>
+<p><strong>柱面（cylinder）</strong>：在有多个盘片构成的盘组中，由不同盘片的面，但处于同一半径圆的多个磁道组成的一个圆柱面。</p>
+<p><strong>扇区（sector）</strong>：磁盘上的每个磁道被等分为若干个弧段，这些弧段便是硬盘的扇区（Sector）。硬盘的第一个扇区，叫做引导扇区。扇区是被间隙（gap）分割的圆的片段，间隙未被磁化成0或者1。注意，扇区是读写磁盘最基本的单位，如果一个扇区因为某种原因被破坏，那么整个扇区的数据都会受影响。</p>
+<p>电脑通过观察磁头接收到的感应电流的方向判断数据是 0 还是 1。通过磁头施加磁场后，对磁介质的磁化作用改变数据的内容。</p>
+<h3 id="抽象结构">
+  抽象结构
+  <a class="anchor" href="#%e6%8a%bd%e8%b1%a1%e7%bb%93%e6%9e%84">#</a>
+</h3>
+<p>以 Linux 系统为例，假设你买了一个 500G 硬盘和一个 32G U 盘，则在系统中被认作磁盘 sda 和 sdb。</p>
+<p>经过格式化，把 sda 格式化为<strong>物理分区（物理卷）</strong>，得到 sda1（500G）。把 sdb 格式化为两个 <strong>物理分区（物理卷）</strong>，得到 sdb1（4G） 和 sdb2（28G，注意，这个容量分配是人决定的）。</p>
+<p>sda1, sdb1 和 sdb2 可以共同构成 <strong>卷组</strong>。</p>
+<p>可以在 <strong>卷组</strong> 上进行逻辑分区，得到<strong>逻辑卷</strong> 1 和逻辑卷 2.</p>
+<h2 id="硬盘的寻址方式">
+  硬盘的寻址方式
+  <a class="anchor" href="#%e7%a1%ac%e7%9b%98%e7%9a%84%e5%af%bb%e5%9d%80%e6%96%b9%e5%bc%8f">#</a>
+</h2>
+<p>寻址就是要读写的数据的位置进行确定。分为 CHS 寻址和 LBA 寻址。</p>
+<p><strong>CHS 寻址</strong>：将硬盘划分为柱面(Cylinder)、磁头（Heads）、扇区(Sector)。使用具体的这三个数据值（<strong>物理地址</strong>）去寻找对应位置的数据。</p>
+<p><strong>LBA 寻址</strong>：地址不再表示实际硬盘的实际物理地址（柱面、磁头和扇区），而是使用<strong>逻辑地址</strong>。LBA编址方式将 CHS 这种三维寻址方式转变为一维的线性寻址，把扇区依次编号，通过编号找到对应的扇区，这样就只需要一个参数。</p>
+<h2 id="文件系统的基本概念">
+  文件系统的基本概念
+  <a class="anchor" href="#%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f%e7%9a%84%e5%9f%ba%e6%9c%ac%e6%a6%82%e5%bf%b5">#</a>
+</h2>
+<h3 id="数据单元">
+  数据单元
+  <a class="anchor" href="#%e6%95%b0%e6%8d%ae%e5%8d%95%e5%85%83">#</a>
+</h3>
+<p>对硬盘进行一次读写操作的最小数据量，称为一个数据单元。在 FAT 和 NTFS 文件系统中称作“簇(Cluster)”， ExtX 文件系统中称作“块(Block)”。</p>
+<p>**如何确定？**取决于建立文件系统时的配置。一个数据单元由若干个连续的扇区组成，大小总是 $2^n$ 个扇区。在 FAT12 文件系统，一个簇的大小就是一个扇区的大小，即 512 Bytes.</p>
+<h3 id="逻辑文件地址">
+  逻辑文件地址
+  <a class="anchor" href="#%e9%80%bb%e8%be%91%e6%96%87%e4%bb%b6%e5%9c%b0%e5%9d%80">#</a>
+</h3>
+<p>对于每个文件来说，将它按所在文件系统中的数据单元大小为单位进行分割，分割后的每一个部分由 0 开始编号，这个编号就是其对应数据单元的逻辑文件地址。一个文件前后相邻的两个数据单元在物理上的存储地址可能是不连续的,但它的逻辑文件地址一定是连续的。</p>
+<h3 id="分配策略">
+  分配策略
+  <a class="anchor" href="#%e5%88%86%e9%85%8d%e7%ad%96%e7%95%a5">#</a>
+</h3>
+<p>连续分配、链接分配和索引分配：请参考 <a href="http://c.biancheng.net/view/1302.html">连续分配、链接分配和索引分配详解 (biancheng.net)</a></p>
+<h3 id="元数据">
+  元数据
+  <a class="anchor" href="#%e5%85%83%e6%95%b0%e6%8d%ae">#</a>
+</h3>
+<p>元数据就是 <strong>关于数据的数据</strong>。比如关于文件的：文件名、创建时间、修改时间。</p>
+<h2 id="fat-文件系统">
+  FAT 文件系统
+  <a class="anchor" href="#fat-%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f">#</a>
+</h2>
+<p>FAT（File Allocation Table，文件分配表）文件系统是windows操作系统所使用的一种文件系统，它的发展过程经历了FAT12、FAT16、FAT32三个阶段。</p>
+<h3 id="fat-的数据单元">
+  FAT 的数据单元
+  <a class="anchor" href="#fat-%e7%9a%84%e6%95%b0%e6%8d%ae%e5%8d%95%e5%85%83">#</a>
+</h3>
+<p>FAT 文件系统的数据单元称为 <strong>簇（Cluster）</strong>，一个“簇”由一组连续的扇区组成，簇所含的扇区数必须是 2 的整数次幂。簇的最大值为 64 个扇区，即 32KB。所有簇从 2 开始进行编号，每个簇都有一个自己的地址编号。用户文件和目录都存储在簇中。</p>
+<p>文件和文件夹内容储存在簇中，如果一个文件或文件夹需要多余一个簇的空间，则用 FAT 表来描述如何找到另外的簇。FAT 结构用于指出文件的下一个簇，同时也说明了簇的分配状态。FAT12、FAT16、FAT32这三种文件系统之间的主要区别在与 FAT 项的大小不同。比如 12 表示 FAT 表项的大小是 12bit。</p>
+<p>FAT 文件系统的每一个文件和文件夹都被分配到一个目录项，目录项中记录着文件名、大小、文件内容起始地址以及其他一些元数据。</p>
+<p>在 FAT 文件系统中，文件系统的数据记录在引导扇区中（DBR）中。引导扇区位于整个文件系统的0号扇区，是文件系统隐藏区域（也称为保留区）的一部分，我们称其为DBR（DOS Boot Recorder——DOS 引导记录）扇区，DBR 中记录着文件系统的起始位置、大小、FAT表个数及大小等相关信息。</p>
+<p>在 FAT 文件系统中，同时使用“扇区地址”和“簇地址”两种地址管理方式。这是因为只有存储用户数据的数据区使用簇进行管理（FAT12 和 FAT16 的根目录除外），所有簇都位于数据区。其他文件系统管理数据区域是不以簇进行管理的，这部分区域使用扇区地址进行管理。文件系统的起始扇区为0号扇区。</p>
+<h3 id="fat-的整体布局">
+  FAT 的整体布局
+  <a class="anchor" href="#fat-%e7%9a%84%e6%95%b4%e4%bd%93%e5%b8%83%e5%b1%80">#</a>
+</h3>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/picgo/20190724164106540.png" alt="fat12 file system" /></p>
+<p>FAT12、FAT16的根目录虽然也属于数据区，但是他们并不由簇进行管理。也就是说FAT12、FAT16的根目录是没有簇号的，他们的2号簇从根目录之后开始。而FAT32的根目录通常位于2号簇。</p>
+<h3 id="引导扇区boot-sector">
+  引导扇区（Boot Sector）
+  <a class="anchor" href="#%e5%bc%95%e5%af%bc%e6%89%87%e5%8c%baboot-sector">#</a>
+</h3>
+<p>共 512 字节，并以 <code>0x55, 0xaa</code> 结尾。结构如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">标识</th>
+<th style="text-align:left">偏移量</th>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">大小</th>
+<th style="text-align:left">说明</th>
+<th style="text-align:left">默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">db</td>
+<td style="text-align:left">3</td>
+<td style="text-align:left">跳转指令</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">BS_OEMName</td>
+<td style="text-align:left">3</td>
+<td style="text-align:left">db</td>
+<td style="text-align:left">8</td>
+<td style="text-align:left">OEM字符串，必须为8个字符，不足以空格填空</td>
+<td style="text-align:left">MSWIN4.1</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_BytsPerSec</td>
+<td style="text-align:left">11</td>
+<td style="text-align:left">dw</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">每扇区字节数</td>
+<td style="text-align:left">200h</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_SecPerClus</td>
+<td style="text-align:left">13</td>
+<td style="text-align:left">db</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">每簇占用的扇区数</td>
+<td style="text-align:left">1</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_RsvdSecCnt</td>
+<td style="text-align:left">14</td>
+<td style="text-align:left">dw</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">保留扇区数</td>
+<td style="text-align:left">1</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_NumFATs</td>
+<td style="text-align:left">16</td>
+<td style="text-align:left">db</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">FAT表的记录数</td>
+<td style="text-align:left">2</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_RootEntCnt</td>
+<td style="text-align:left">17</td>
+<td style="text-align:left">dw</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">最大根目录文件数</td>
+<td style="text-align:left">0e0h</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_TotSec16</td>
+<td style="text-align:left">19</td>
+<td style="text-align:left">dw</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">逻辑扇区总数</td>
+<td style="text-align:left">0b40h</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_Media</td>
+<td style="text-align:left">21</td>
+<td style="text-align:left">db</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">媒体描述符</td>
+<td style="text-align:left">0f0h</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_FATSz16</td>
+<td style="text-align:left">22</td>
+<td style="text-align:left">dw</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">每个FAT占用扇区数</td>
+<td style="text-align:left">9</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_SecPerTrk</td>
+<td style="text-align:left">24</td>
+<td style="text-align:left">dw</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">每个磁道扇区数</td>
+<td style="text-align:left">12h</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_NumHeads</td>
+<td style="text-align:left">26</td>
+<td style="text-align:left">dw</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">磁头数</td>
+<td style="text-align:left">2</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_HiddSec</td>
+<td style="text-align:left">28</td>
+<td style="text-align:left">dd</td>
+<td style="text-align:left">4</td>
+<td style="text-align:left">隐藏扇区数</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left">BPB_TotSec32</td>
+<td style="text-align:left">32</td>
+<td style="text-align:left">dd</td>
+<td style="text-align:left">4</td>
+<td style="text-align:left">如果BPB_TotSec16是0，则在这里记录扇区总数</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left">BS_DrvNum</td>
+<td style="text-align:left">36</td>
+<td style="text-align:left">db</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">中断13的驱动器号</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left">BS_Reserved1</td>
+<td style="text-align:left">37</td>
+<td style="text-align:left">db</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">未使用</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left">BS_BootSig</td>
+<td style="text-align:left">38</td>
+<td style="text-align:left">db</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">扩展引导标志</td>
+<td style="text-align:left">29h</td>
+</tr>
+<tr>
+<td style="text-align:left">BS_VolID</td>
+<td style="text-align:left">39</td>
+<td style="text-align:left">dd</td>
+<td style="text-align:left">4</td>
+<td style="text-align:left">卷序列号</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left">BS_VolLab</td>
+<td style="text-align:left">43</td>
+<td style="text-align:left">db</td>
+<td style="text-align:left">11</td>
+<td style="text-align:left">卷标，必须是11个字符，不足以空格填充</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">BS_FileSysType</td>
+<td style="text-align:left">54</td>
+<td style="text-align:left">db</td>
+<td style="text-align:left">8</td>
+<td style="text-align:left">文件系统类型，必须是8个字符，不足填充空格</td>
+<td style="text-align:left">FAT12</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">62</td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+<td style="text-align:left">引导代码，由偏移0字节处的短跳转而来</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">510</td>
+<td style="text-align:left">dw</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">系统引导标识</td>
+<td style="text-align:left">0aa55h</td>
+</tr>
+</tbody>
+</table>
+<p>文件系统分配磁盘空间按簇来分配的。因此，文件占用磁盘空间是，基本单位不是字节而是簇，即使某个文件只有一个字节，系统也会给他分配一个最小单元——即一个簇。簇的长度是 <code>BPB_BytesPerSec * BPB_SecPerClus</code></p>
+<h2 id="fat-表的特性">
+  FAT 表的特性
+  <a class="anchor" href="#fat-%e8%a1%a8%e7%9a%84%e7%89%b9%e6%80%a7">#</a>
+</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">FAT12</th>
+<th style="text-align:center">FAT16</th>
+<th style="text-align:center">FAT32</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0x000</td>
+<td style="text-align:center">0x0000</td>
+<td style="text-align:center">0x?0000000</td>
+<td style="text-align:center">空闲簇</td>
+</tr>
+<tr>
+<td style="text-align:center">0x001</td>
+<td style="text-align:center">0x0001</td>
+<td style="text-align:center">0x?0000001</td>
+<td style="text-align:center">保留簇</td>
+</tr>
+<tr>
+<td style="text-align:center">0x002 - 0xFEF</td>
+<td style="text-align:center">0x0002 - 0xFFEF</td>
+<td style="text-align:center">0x?0000002 - 0x?FFFFFEF</td>
+<td style="text-align:center">被占用的簇；指向下一个簇</td>
+</tr>
+<tr>
+<td style="text-align:center">0xFF0 - 0xFF6</td>
+<td style="text-align:center">0xFFF0 - 0xFFF6</td>
+<td style="text-align:center">0x?FFFFFF0 - 0x?FFFFFF6</td>
+<td style="text-align:center">保留值</td>
+</tr>
+<tr>
+<td style="text-align:center">0xFF7</td>
+<td style="text-align:center">0xFFF7</td>
+<td style="text-align:center">0x?FFFFFF7</td>
+<td style="text-align:center">坏簇</td>
+</tr>
+<tr>
+<td style="text-align:center">0xFF8 - 0xFFF</td>
+<td style="text-align:center">0xFFF8 - 0xFFFF</td>
+<td style="text-align:center">0x?FFFFFF8 - 0x?FFFFFFF</td>
+<td style="text-align:center">文档最后一个簇</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>注意 FAT32 只使用 32 位中的 28 位。高 4 位通常是 0 但它们是保留位，不要更改它们。在上面的表中它们用问号表示。</p>
+</blockquote>
+<ul>
+<li>
+<p>FAT32 中每个簇的状态，使用 32bit(4字节)记录在 FAT 表中。 FAT 表中的所有字节位置以 4 个字节为单位进行划分；并以所有划分后的位置由0进行地址编号。“0号 和 1号” 地址被系统保留并存储特殊标识内容。从 2号 地址开始， 每个地址对应于数据区的簇号， FAT 表中的地址编号与数据区中的簇号相同。 <strong>称FAT 中的这些四字节一组划分的项的地址为 FAT 表项</strong>， <strong>FAT表项中记录的值为FAT 表项值。</strong>(簇编号与簇内内容关系如果 Map中的键-值 关系相同)</p>
+</li>
+<li>
+<p>当文件系统创建时（就是格式化操作时）， 分配给FAT 区域的空间将会被清空， 在FAT1与FAT2 的0号和1号表项写入特定值。 由于创建文件系统的同时，也会创建根目录， 也就是为根目录分配了一个簇空间，通常为 2 号簇，所以 2 号簇所对应的“2号FAT表项”也会被写入一个结束标记。</p>
+</li>
+<li>
+<p>如果某个簇未被使用，他所对应的FAT 表项内的FAT 表项值即用0进行填充，表示该FAT 表项所对应的簇未被分配使用</p>
+</li>
+<li>
+<p>当某个簇被分配使用时，那么他所对应的FAT表项的值为文件的下一个存储文件的簇号。 如果该文件结束于该簇，则在它的FAT表项中记录的是一个文件结束标记，对于FAT32 而言，代表<strong>文件结束的FAT表项值为0x0FFFFFFF。</strong></p>
+</li>
+<li>
+<p>如果某个簇存在坏扇区，则整个簇会用FAT 表项值 <strong>0x0FFFFFF7 标记为坏簇</strong>， 不再使用，这个坏簇标记就记录在它所对应的FAT表项中。</p>
+</li>
+<li>
+<p>由于簇号起始于 2， 所以FAT表的 0 号表项与 1 号表项不予任何簇对应。 <strong>FAT32 的0号表项值总是“F8FFFF0F”</strong></p>
+</li>
+<li>
+<p>1号表项可能被用于记录脏标志,以说明文件系统没有被正++++++++++++++++++++++++++</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>注意：</strong> 可以搜索扇区偏移0字节处的该值(F8FFF0F)以查找FAT表。</p>
+</blockquote>
+<ul>
+<li>1号表项可能被用于记录脏标志，以说明文件系统没有被正常卸载或者磁盘表面存在错误。不过这个值并不重要。正常情况下1号表项的值为“FFFFFFFF”或“FFFFFF0F”。</li>
+</ul>
+<h3 id="fat-表项填写规则">
+  FAT 表项填写规则
+  <a class="anchor" href="#fat-%e8%a1%a8%e9%a1%b9%e5%a1%ab%e5%86%99%e8%a7%84%e5%88%99">#</a>
+</h3>
+<ul>
+<li>在文件系统中新建文件时，如果新建的文件只占用一个簇，为其分配的簇对应的 FAT 表项将会写入结束标记。如果新建的文件不只占用 一个簇，则在其所占用的每个簇对应的 FAT 表项中写入为其分配的下一簇的簇号，在最后一个簇对应的 FAT 表项中写入结束标记。（尾指针的链表）</li>
+<li>新建目录时，只为其分配一个簇的空间，对应的 FAT 表项中写入结束标记。当目录增大超出一个簇的大小时，将会在空闲空间中继续为其分配一个簇，并在 FAT 表中为其建立 FAT 表链以描述它所占用的簇情况。</li>
+<li>对文件或目录进行操作时，他们所对应的FAT表项将会被清空，设置为0以表示其所对应的簇处于未分配状态。</li>
+</ul>
+<h3 id="fat-表的使用">
+  FAT 表的使用
+  <a class="anchor" href="#fat-%e8%a1%a8%e7%9a%84%e4%bd%bf%e7%94%a8">#</a>
+</h3>
+<p>一个文件的&quot;起始簇号&quot;记录在它的目录项中， 该文件的 &ldquo;其他簇&rdquo; 则用一个簇连结构记录在 FAT 表中。</p>
+<p>如果一个簇所对应的 FAT 表项的表项值为非零， 则表明该簇已经被分配使用了，但是这时表项值可能为两种情况，一个是一个文件的下一个簇号值，也有可能是一个文件的结束标记 <code>0x0FFFFFFF</code>，或者是一个坏簇标记 <code>0x0FFFFFF7</code> 。</p>
+<p>如果要寻找一个文件的下一个簇，只需要查看该文件的目录项中描述的起始簇号所对应的 FAT 项，如果该文件只有一个簇，则此处的值为一个结束标记 <code>0x0FFFFFFF</code>；如果该文件不只一个簇，则此处的值是它的下一个簇的簇号。</p>
+<h3 id="读取一个文件的步骤">
+  读取一个文件的步骤
+  <a class="anchor" href="#%e8%af%bb%e5%8f%96%e4%b8%80%e4%b8%aa%e6%96%87%e4%bb%b6%e7%9a%84%e6%ad%a5%e9%aa%a4">#</a>
+</h3>
+<p>当我们要寻找某个文件时， 首先从该文件的“目录项”中获取该文件的第一“簇”的簇号，然后根据“第一簇”的“簇号 N”，从 FAT 区的 FAT 表找出 N 簇号所对应的 FAT 表项，查看 FAT 表项的内容：</p>
+<p>若是文件结束，该表项值为 0x0FFFFFFF； 若是没有结束，而该文件的内容不止一个簇，则 N 所对应的 FAT 表项的表项值为该文件下一个簇的簇号，然后再找到下一个簇号 N+1 所对应的 FAT 表项，查看其表项值，依次类推，就推出了一个文件在FAT表中的簇链连接结构； 也或者表项值为 <code>0xFFFFFFF7</code> 坏簇标识。</p>
+<p><strong>查找FAT 表项：</strong> 要找到一个簇的 FAT 表项，只要用他的 簇号乘以每个 FAT 表项的字节数即可 。对于 FAT32 而言，每个FAT 表项占用 32bit，4Bytes， 如果我们寻找 9 号簇的表项位置，则用 4*9=36，也就是说位于FAT 表内偏移 6(0x24)字节处。</p>
+<h2 id="fat32-的数据区">
+  FAT32 的数据区
+  <a class="anchor" href="#fat32-%e7%9a%84%e6%95%b0%e6%8d%ae%e5%8c%ba">#</a>
+</h2>
+<p>数据区位于 FAT 表之后，可分为 <strong>目录区</strong> 和 <strong>文件数据区</strong>。</p>
+<h3 id="根目录">
+  根目录
+  <a class="anchor" href="#%e6%a0%b9%e7%9b%ae%e5%bd%95">#</a>
+</h3>
+<p>对于FAT12/FAT16：</p>
+<ul>
+<li>
+<p>根目录存储在磁盘固定的地方，紧跟在最后一个FAT表后</p>
+</li>
+<li>
+<p>根目录的扇区数固定，根据BPB_RootEntCnt计算得出</p>
+</li>
+<li>
+<p>FAT12/FAT16根目录的扇区号是相对该FAT卷第一个扇区的偏移量</p>
+</li>
+</ul>
+<p>对于FAT32：</p>
+<ul>
+<li>
+<p>根目录由簇链组成，扇区数不固定，跟普通文件相同。</p>
+</li>
+<li>
+<p>根目录的第一个簇号存储在BPB_RootClus中，这个值通常为2，也就是FAT32的根目录通常存放在数据区</p>
+</li>
+<li>
+<p>根目录有一个设置了ATTR_VOLUMN_ID属性位的文件，此文件在整个FAT卷是唯一的</p>
+</li>
+</ul>
+<p><strong>目录区</strong> 由 <strong>目录项</strong> 组成，FAT32 目录项的结构如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/pluveto/0images@master/picgo/1138116-20180212165302796-94008843.png" alt="img" /></p>
+<p>上图是短文件名目录项和长文件名目录项的概述，详情请阅读：</p>
+<p><a href="https://www.cnblogs.com/fantacity/p/3900237.html">FAT32文件系统学习(3) —— 数据区(DATA区) - Yosef Gao - 博客园 (cnblogs.com)</a></p>
+<h2 id="参考">
+  参考
+  <a class="anchor" href="#%e5%8f%82%e8%80%83">#</a>
+</h2>
+<p><a href="https://zhuanlan.zhihu.com/p/89505052">磁盘原理介绍 - 知乎 (zhihu.com)</a></p>
+<p><a href="https://www.cnblogs.com/lijiaman/p/12885649.html">Linux 物理卷(PV)、逻辑卷(LV)、卷组(VG)管理 - gegeman - 博客园 (cnblogs.com)</a></p>
+<p><a href="https://wenku.baidu.com/view/33fe13106bd97f192379e906.html">FAT文件系统学习笔记(基于SD卡) - 百度文库 (baidu.com)</a></p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#硬盘的结构和原理">硬盘的结构和原理</a>
+      <ul>
+        <li><a href="#物理结构">物理结构</a></li>
+        <li><a href="#抽象结构">抽象结构</a></li>
+      </ul>
+    </li>
+    <li><a href="#硬盘的寻址方式">硬盘的寻址方式</a></li>
+    <li><a href="#文件系统的基本概念">文件系统的基本概念</a>
+      <ul>
+        <li><a href="#数据单元">数据单元</a></li>
+        <li><a href="#逻辑文件地址">逻辑文件地址</a></li>
+        <li><a href="#分配策略">分配策略</a></li>
+        <li><a href="#元数据">元数据</a></li>
+      </ul>
+    </li>
+    <li><a href="#fat-文件系统">FAT 文件系统</a>
+      <ul>
+        <li><a href="#fat-的数据单元">FAT 的数据单元</a></li>
+        <li><a href="#fat-的整体布局">FAT 的整体布局</a></li>
+        <li><a href="#引导扇区boot-sector">引导扇区（Boot Sector）</a></li>
+      </ul>
+    </li>
+    <li><a href="#fat-表的特性">FAT 表的特性</a>
+      <ul>
+        <li><a href="#fat-表项填写规则">FAT 表项填写规则</a></li>
+        <li><a href="#fat-表的使用">FAT 表的使用</a></li>
+        <li><a href="#读取一个文件的步骤">读取一个文件的步骤</a></li>
+      </ul>
+    </li>
+    <li><a href="#fat32-的数据区">FAT32 的数据区</a>
+      <ul>
+        <li><a href="#根目录">根目录</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

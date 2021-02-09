@@ -132,8 +132,7 @@ PS C:\Users\i\.</description>
 pluvet@localos:~/dev$ tar -zvxf bochs-2.6.11.tar.gz 进行解压。
 进入解压到的目录
 pluvet@localos:~/dev$ cd bochs-2.6.11/ 编译安装#以防万一，请先执行：
-sudo apt install libx11-devsudo apt install xorg-dev编辑 bx_debug/dbg_main.cpp，变更如下：
-Description: Fix the build with SMP enabled Origin: https://sourceforge.</description>
+sudo apt install libx11-devsudo apt install xorg-dev为了知道如何安装，我们看一下 bochs: The Open Source IA-32 Emulation Project (New Bochs Documentation) (sourceforge.</description>
     </item>
     
     <item>
@@ -149,6 +148,29 @@ BIOS 如何执行引导程序#BIOS 会读取启动设备的前 512B（B 是�
 sudo apt install nasm 安装 HexEdit#Hexedit 是一个十六进制编译器。安装：
 sudo apt install hexedit 第一个引导程序#下面，我们用 Intel 汇编，编写一个最简单的引导程序：
 ; 告知编译器程序的起始位置org 0x7c00BaseOfStack equ 0x7c00Label_Start:mov ax, csmov ds, axmov es, axmov ss, axmov sp, BaseOfStack; ======== 清屏mov ax, 0600hmov bx, 0700hmov cx, 0mov dx, 0184fhint 10h; ======== 设置焦点mov ax, 0200hmov bx, 0000hmov dx, 0000hint 10h; ======== 在屏幕上显示 Start Booting.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://os-dev.incolore.net/docs/2.2-fat-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://os-dev.incolore.net/docs/2.2-fat-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/</guid>
+      <description>硬盘的结构和原理#物理结构#历史上的机械硬盘，很像是层层叠起的光盘。虽然如今已经有固态硬盘等更快的存储设备，但是对文件系统进行抽象设计时，我们依旧沿用这些老的概念。
+你可以观看这个视频 【回形针PaperClip】你的硬盘是如何储存数据的？ 获得一些基础知识。
+磁头（head）：可以读写磁盘表面的磁向。每个盘面有一个磁头，它极其贴近地悬浮在盘面上，但是绝对不与盘面接触，否则会损坏磁头和盘面；
+磁道（track）：磁道是单个盘面上的同心圆，当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道，一个盘面上的磁道可以有成千上万个。相邻磁道之间并不是紧挨着的，这是因为磁化单元相隔太近时磁性会产生相互影响，同时也为磁头的读写带来困难。
+柱面（cylinder）：在有多个盘片构成的盘组中，由不同盘片的面，但处于同一半径圆的多个磁道组成的一个圆柱面。
+扇区（sector）：磁盘上的每个磁道被等分为若干个弧段，这些弧段便是硬盘的扇区（Sector）。硬盘的第一个扇区，叫做引导扇区。扇区是被间隙（gap）分割的圆的片段，间隙未被磁化成0或者1。注意，扇区是读写磁盘最基本的单位，如果一个扇区因为某种原因被破坏，那么整个扇区的数据都会受影响。
+电脑通过观察磁头接收到的感应电流的方向判断数据是 0 还是 1。通过磁头施加磁场后，对磁介质的磁化作用改变数据的内容。
+抽象结构#以 Linux 系统为例，假设你买了一个 500G 硬盘和一个 32G U 盘，则在系统中被认作磁盘 sda 和 sdb。
+经过格式化，把 sda 格式化为物理分区（物理卷），得到 sda1（500G）。把 sdb 格式化为两个 物理分区（物理卷），得到 sdb1（4G） 和 sdb2（28G，注意，这个容量分配是人决定的）。
+sda1, sdb1 和 sdb2 可以共同构成 卷组。
+可以在 卷组 上进行逻辑分区，得到逻辑卷 1 和逻辑卷 2.
+硬盘的寻址方式#寻址就是要读写的数据的位置进行确定。分为 CHS 寻址和 LBA 寻址。
+CHS 寻址：将硬盘划分为柱面(Cylinder)、磁头（Heads）、扇区(Sector)。使用具体的这三个数据值（物理地址）去寻找对应位置的数据。
+LBA 寻址：地址不再表示实际硬盘的实际物理地址（柱面、磁头和扇区），而是使用逻辑地址。LBA编址方式将 CHS 这种三维寻址方式转变为一维的线性寻址，把扇区依次编号，通过编号找到对应的扇区，这样就只需要一个参数。
+文件系统的基本概念#数据单元#对硬盘进行一次读写操作的最小数据量，称为一个数据单元。在 FAT 和 NTFS 文件系统中称作“簇(Cluster)”， ExtX 文件系统中称作“块(Block)”。</description>
     </item>
     
     <item>
