@@ -121,7 +121,7 @@ PS C:\Users\i\.</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://os-dev.incolore.net/docs/1.6-%E5%9C%A8-ubuntu-%E4%B8%AD%E5%AE%89%E8%A3%85-bochs-%E8%99%9A%E6%8B%9F%E6%9C%BA/</guid>
-      <description>下载 Bochs#访问 Bochs x86 PC emulator - Browse /bochs at SourceForge.net。
+      <description>在 Ubuntu 中安装 Bochs 虚拟机#下载 Bochs#访问 Bochs x86 PC emulator - Browse /bochs at SourceForge.net。
 找到最新版：
 我们要编译安装，所以下载 bochs-2.6.11.tar.gz
 下载之后是存放在 Windows 上的（当然，你也可以直接在 Ubuntu 中打开 Firefox 浏览器下载），我们直接用 VSCode 传输到 Ubuntu 中。
@@ -141,7 +141,7 @@ sudo apt install libx11-devsudo apt install xorg-dev为了知道如何安装�
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://os-dev.incolore.net/docs/2.1-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/</guid>
-      <description>什么是 BIOS#BIOS 就是内置在主板上的一个程序，当系统启动时，会执行 BIOS 中的代码，进行设备检查（称为自检）等等。当检查通过之后，会读取 启动设备 中的引导程序，从而将操作系统加载到内存运行。
+      <description>第一个引导程序#什么是 BIOS#BIOS 就是内置在主板上的一个程序，当系统启动时，会执行 BIOS 中的代码，进行设备检查（称为自检）等等。当检查通过之后，会读取 启动设备 中的引导程序，从而将操作系统加载到内存运行。
 什么是引导程序#引导程序就是把操作系统加载到内存，带动运行操作系统的程序。
 BIOS 如何执行引导程序#BIOS 会读取启动设备的前 512B（B 是字节单位，Byte），这些字节是设备的第一个扇区，如果这个扇区的结束字节是 0x55, 0xaa 则表示这个扇区是可引导扇区，这些字节称为（即主引导记录（master boot record，MBR）），将这一块加载到物理内存（具体位置是 0x7c00）中，然后执行其中的二进制代码（这些代码就是引导程序）。
 安装 NASM#NASM 是将汇编代码编译为二进制的工具。安装方式：
@@ -156,7 +156,7 @@ sudo apt install hexedit 第一个引导程序#下面，我们用 Intel 汇�
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://os-dev.incolore.net/docs/2.2-fat-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/</guid>
-      <description>硬盘的结构和原理#物理结构#历史上的机械硬盘，很像是层层叠起的光盘。虽然如今已经有固态硬盘等更快的存储设备，但是对文件系统进行抽象设计时，我们依旧沿用这些老的概念。
+      <description>FAT 文件系统#硬盘的结构和原理#物理结构#历史上的机械硬盘，很像是层层叠起的光盘。虽然如今已经有固态硬盘等更快的存储设备，但是对文件系统进行抽象设计时，我们依旧沿用这些老的概念。
 你可以观看这个视频 【回形针PaperClip】你的硬盘是如何储存数据的？ 获得一些基础知识。
 磁头（head）：可以读写磁盘表面的磁向。每个盘面有一个磁头，它极其贴近地悬浮在盘面上，但是绝对不与盘面接触，否则会损坏磁头和盘面；
 磁道（track）：磁道是单个盘面上的同心圆，当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道，一个盘面上的磁道可以有成千上万个。相邻磁道之间并不是紧挨着的，这是因为磁化单元相隔太近时磁性会产生相互影响，同时也为磁头的读写带来困难。
@@ -169,8 +169,18 @@ sda1, sdb1 和 sdb2 可以共同构成 卷组。
 可以在 卷组 上进行逻辑分区，得到逻辑卷 1 和逻辑卷 2.
 硬盘的寻址方式#寻址就是要读写的数据的位置进行确定。分为 CHS 寻址和 LBA 寻址。
 CHS 寻址：将硬盘划分为柱面(Cylinder)、磁头（Heads）、扇区(Sector)。使用具体的这三个数据值（物理地址）去寻找对应位置的数据。
-LBA 寻址：地址不再表示实际硬盘的实际物理地址（柱面、磁头和扇区），而是使用逻辑地址。LBA编址方式将 CHS 这种三维寻址方式转变为一维的线性寻址，把扇区依次编号，通过编号找到对应的扇区，这样就只需要一个参数。
-文件系统的基本概念#数据单元#对硬盘进行一次读写操作的最小数据量，称为一个数据单元。在 FAT 和 NTFS 文件系统中称作“簇(Cluster)”， ExtX 文件系统中称作“块(Block)”。</description>
+LBA 寻址：地址不再表示实际硬盘的实际物理地址（柱面、磁头和扇区），而是使用逻辑地址。LBA编址方式将 CHS 这种三维寻址方式转变为一维的线性寻址，把扇区依次编号，通过编号找到对应的扇区，这样就只需要一个参数。</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://os-dev.incolore.net/docs/2.3-bootloader-%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://os-dev.incolore.net/docs/2.3-bootloader-%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/</guid>
+      <description>了解了 FAT12 文件系统，我们编写一个 BootLoader 程序。
+编写 boot#先上代码：
+org	0x7c00	BaseOfStackequ	0x7c00 ; Loader 程序的起始物理地址：BaseofLoader &amp;lt;&amp;lt; 4 + OffsetOfLoader = 0x10000 BaseOfLoaderequ	0x1000 OffsetOfLoaderequ	0x00 ; 根目录占用的扇区数 ; 14 = (BPB_RootEntCnt * 32 + BPB_BytesPerSec - 1) / BPB_BytesPerSec RootDirSectorsequ	14 ; 根目录的起始扇区号 ; 19 = 保留扇区数 + FAT表扇区数 * FAT 表份数 SectorNumOfRootDirStartequ	19 ; FAT 表的起始扇区号 SectorNumOfFAT1Startequ	1 ; 由于文件起始簇号与数据起始簇号的差值而建立的变量 ; 17 = 根目录起始扇区号 - 2 SectorBalanceequ	17	jmp	short Label_Start nop BS_OEMName	db	&amp;#39;MINEboot&amp;#39; BPB_BytesPerSec	dw	512 BPB_SecPerClus	db	1 BPB_RsvdSecCnt	dw	1 BPB_NumFATs	db	2 BPB_RootEntCnt	dw	224 BPB_TotSec16	dw	2880 BPB_Media	db	0xf0 BPB_FATSz16	dw	9 BPB_SecPerTrk	dw	18 BPB_NumHeads	dw	2 BPB_HiddSec	dd	0 BPB_TotSec32	dd	0 BS_DrvNum	db	0 BS_Reserved1	db	0 BS_BootSig	db	0x29 BS_VolID	dd	0 BS_VolLab	db	&amp;#39;boot loader&amp;#39; BS_FileSysType	db	&amp;#39;FAT12 &amp;#39; Label_Start: mov	ax,	cs mov	ds,	ax mov	es,	ax mov	ss,	ax mov	sp,	BaseOfStack ;=======	clear screen mov	ax,	0600h mov	bx,	0700h mov	cx,	0 mov	dx,	0184fh int	10h ;=======	set focus mov	ax,	0200h mov	bx,	0000h mov	dx,	0000h int	10h ;=======	display on screen : Start Booting.</description>
     </item>
     
     <item>

@@ -5,7 +5,7 @@
   <meta name="generator" content="Hugo 0.80.0" />
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="硬盘的结构和原理#物理结构#历史上的机械硬盘，很像是层层叠起的光盘。虽然如今已经有固态硬盘等更快的存储设备，但是对文件系统进行抽象设计时，我们依旧沿用这些老的概念。
+<meta name="description" content="FAT 文件系统#硬盘的结构和原理#物理结构#历史上的机械硬盘，很像是层层叠起的光盘。虽然如今已经有固态硬盘等更快的存储设备，但是对文件系统进行抽象设计时，我们依旧沿用这些老的概念。
 你可以观看这个视频 【回形针PaperClip】你的硬盘是如何储存数据的？ 获得一些基础知识。
 磁头（head）：可以读写磁盘表面的磁向。每个盘面有一个磁头，它极其贴近地悬浮在盘面上，但是绝对不与盘面接触，否则会损坏磁头和盘面；
 磁道（track）：磁道是单个盘面上的同心圆，当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道，一个盘面上的磁道可以有成千上万个。相邻磁道之间并不是紧挨着的，这是因为磁化单元相隔太近时磁性会产生相互影响，同时也为磁头的读写带来困难。
@@ -18,10 +18,9 @@ sda1, sdb1 和 sdb2 可以共同构成 卷组。
 可以在 卷组 上进行逻辑分区，得到逻辑卷 1 和逻辑卷 2.
 硬盘的寻址方式#寻址就是要读写的数据的位置进行确定。分为 CHS 寻址和 LBA 寻址。
 CHS 寻址：将硬盘划分为柱面(Cylinder)、磁头（Heads）、扇区(Sector)。使用具体的这三个数据值（物理地址）去寻找对应位置的数据。
-LBA 寻址：地址不再表示实际硬盘的实际物理地址（柱面、磁头和扇区），而是使用逻辑地址。LBA编址方式将 CHS 这种三维寻址方式转变为一维的线性寻址，把扇区依次编号，通过编号找到对应的扇区，这样就只需要一个参数。
-文件系统的基本概念#数据单元#对硬盘进行一次读写操作的最小数据量，称为一个数据单元。在 FAT 和 NTFS 文件系统中称作“簇(Cluster)”， ExtX 文件系统中称作“块(Block)”。">
+LBA 寻址：地址不再表示实际硬盘的实际物理地址（柱面、磁头和扇区），而是使用逻辑地址。LBA编址方式将 CHS 这种三维寻址方式转变为一维的线性寻址，把扇区依次编号，通过编号找到对应的扇区，这样就只需要一个参数。">
 <meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
-<meta property="og:description" content="硬盘的结构和原理#物理结构#历史上的机械硬盘，很像是层层叠起的光盘。虽然如今已经有固态硬盘等更快的存储设备，但是对文件系统进行抽象设计时，我们依旧沿用这些老的概念。
+<meta property="og:description" content="FAT 文件系统#硬盘的结构和原理#物理结构#历史上的机械硬盘，很像是层层叠起的光盘。虽然如今已经有固态硬盘等更快的存储设备，但是对文件系统进行抽象设计时，我们依旧沿用这些老的概念。
 你可以观看这个视频 【回形针PaperClip】你的硬盘是如何储存数据的？ 获得一些基础知识。
 磁头（head）：可以读写磁盘表面的磁向。每个盘面有一个磁头，它极其贴近地悬浮在盘面上，但是绝对不与盘面接触，否则会损坏磁头和盘面；
 磁道（track）：磁道是单个盘面上的同心圆，当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道，一个盘面上的磁道可以有成千上万个。相邻磁道之间并不是紧挨着的，这是因为磁化单元相隔太近时磁性会产生相互影响，同时也为磁头的读写带来困难。
@@ -34,8 +33,7 @@ sda1, sdb1 和 sdb2 可以共同构成 卷组。
 可以在 卷组 上进行逻辑分区，得到逻辑卷 1 和逻辑卷 2.
 硬盘的寻址方式#寻址就是要读写的数据的位置进行确定。分为 CHS 寻址和 LBA 寻址。
 CHS 寻址：将硬盘划分为柱面(Cylinder)、磁头（Heads）、扇区(Sector)。使用具体的这三个数据值（物理地址）去寻找对应位置的数据。
-LBA 寻址：地址不再表示实际硬盘的实际物理地址（柱面、磁头和扇区），而是使用逻辑地址。LBA编址方式将 CHS 这种三维寻址方式转变为一维的线性寻址，把扇区依次编号，通过编号找到对应的扇区，这样就只需要一个参数。
-文件系统的基本概念#数据单元#对硬盘进行一次读写操作的最小数据量，称为一个数据单元。在 FAT 和 NTFS 文件系统中称作“簇(Cluster)”， ExtX 文件系统中称作“块(Block)”。" />
+LBA 寻址：地址不再表示实际硬盘的实际物理地址（柱面、磁头和扇区），而是使用逻辑地址。LBA编址方式将 CHS 这种三维寻址方式转变为一维的线性寻址，把扇区依次编号，通过编号找到对应的扇区，这样就只需要一个参数。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://os-dev.incolore.net/docs/2.2-fat-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" />
 
@@ -43,7 +41,7 @@ LBA 寻址：地址不再表示实际硬盘的实际物理地址（柱面、磁�
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/book.min.134b70e5316650a530cb42e4e8630b2a01d532bebfc0337028211175336e4806.css" integrity="sha256-E0tw5TFmUKUwy0Lk6GMLKgHVMr6/wDNwKCERdTNuSAY=">
-<script defer src="/en.search.min.7d6f73ecb8b11fffa116712d8ed207badfe87831f50ca32c2b2afd18e0caa422.js" integrity="sha256-fW9z7LixH/&#43;hFnEtjtIHut/oeDH1DKMsKyr9GODKpCI="></script>
+<script defer src="/en.search.min.7302a9179b1084d68c9328108c097b2d672ec8a8e426ad431cd96f98ded4217a.js" integrity="sha256-cwKpF5sQhNaMkygQjAl7LWcuyKjkJq1DHNlvmN7UIXo="></script>
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -96,6 +94,7 @@ https://github.com/alex-shpak/hugo-book
 <ul>
 <li><a href="/docs/2.1-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/">2.1 第一个引导程序</a></li>
 <li><a href="/docs/2.2-fat-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/"class=active>2.2 FAT 文件系统</a></li>
+<li><a href="/docs/2.3-bootloader-%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/">2.3 BootLoader 引导程序</a></li>
 </ul>
 </li>
 <li><a href="/posts/">Blog</a>
@@ -166,7 +165,7 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#元数据">元数据</a></li>
       </ul>
     </li>
-    <li><a href="#fat-文件系统">FAT 文件系统</a>
+    <li><a href="#fat-文件系统-1">FAT 文件系统</a>
       <ul>
         <li><a href="#fat-的数据单元">FAT 的数据单元</a></li>
         <li><a href="#fat-的整体布局">FAT 的整体布局</a></li>
@@ -197,7 +196,11 @@ https://github.com/alex-shpak/hugo-book
 
       
       
-  <article class="markdown"><h2 id="硬盘的结构和原理">
+  <article class="markdown"><h1 id="fat-文件系统">
+  FAT 文件系统
+  <a class="anchor" href="#fat-%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f">#</a>
+</h1>
+<h2 id="硬盘的结构和原理">
   硬盘的结构和原理
   <a class="anchor" href="#%e7%a1%ac%e7%9b%98%e7%9a%84%e7%bb%93%e6%9e%84%e5%92%8c%e5%8e%9f%e7%90%86">#</a>
 </h2>
@@ -253,9 +256,9 @@ https://github.com/alex-shpak/hugo-book
   <a class="anchor" href="#%e5%85%83%e6%95%b0%e6%8d%ae">#</a>
 </h3>
 <p>元数据就是 <strong>关于数据的数据</strong>。比如关于文件的：文件名、创建时间、修改时间。</p>
-<h2 id="fat-文件系统">
+<h2 id="fat-文件系统-1">
   FAT 文件系统
-  <a class="anchor" href="#fat-%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f">#</a>
+  <a class="anchor" href="#fat-%e6%96%87%e4%bb%b6%e7%b3%bb%e7%bb%9f-1">#</a>
 </h2>
 <p>FAT（File Allocation Table，文件分配表）文件系统是windows操作系统所使用的一种文件系统，它的发展过程经历了FAT12、FAT16、FAT32三个阶段。</p>
 <h3 id="fat-的数据单元">
@@ -670,7 +673,7 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#元数据">元数据</a></li>
       </ul>
     </li>
-    <li><a href="#fat-文件系统">FAT 文件系统</a>
+    <li><a href="#fat-文件系统-1">FAT 文件系统</a>
       <ul>
         <li><a href="#fat-的数据单元">FAT 的数据单元</a></li>
         <li><a href="#fat-的整体布局">FAT 的整体布局</a></li>

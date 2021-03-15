@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en" dir=>
+
+<head>
+  <meta name="generator" content="Hugo 0.80.0" />
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="了解了 FAT12 文件系统，我们编写一个 BootLoader 程序。
+编写 boot#先上代码：
+org	0x7c00	BaseOfStackequ	0x7c00 ; Loader 程序的起始物理地址：BaseofLoader &lt;&lt; 4 &#43; OffsetOfLoader = 0x10000 BaseOfLoaderequ	0x1000 OffsetOfLoaderequ	0x00 ; 根目录占用的扇区数 ; 14 = (BPB_RootEntCnt * 32 &#43; BPB_BytesPerSec - 1) / BPB_BytesPerSec RootDirSectorsequ	14 ; 根目录的起始扇区号 ; 19 = 保留扇区数 &#43; FAT表扇区数 * FAT 表份数 SectorNumOfRootDirStartequ	19 ; FAT 表的起始扇区号 SectorNumOfFAT1Startequ	1 ; 由于文件起始簇号与数据起始簇号的差值而建立的变量 ; 17 = 根目录起始扇区号 - 2 SectorBalanceequ	17	jmp	short Label_Start nop BS_OEMName	db	&#39;MINEboot&#39; BPB_BytesPerSec	dw	512 BPB_SecPerClus	db	1 BPB_RsvdSecCnt	dw	1 BPB_NumFATs	db	2 BPB_RootEntCnt	dw	224 BPB_TotSec16	dw	2880 BPB_Media	db	0xf0 BPB_FATSz16	dw	9 BPB_SecPerTrk	dw	18 BPB_NumHeads	dw	2 BPB_HiddSec	dd	0 BPB_TotSec32	dd	0 BS_DrvNum	db	0 BS_Reserved1	db	0 BS_BootSig	db	0x29 BS_VolID	dd	0 BS_VolLab	db	&#39;boot loader&#39; BS_FileSysType	db	&#39;FAT12 &#39; Label_Start: mov	ax,	cs mov	ds,	ax mov	es,	ax mov	ss,	ax mov	sp,	BaseOfStack ;=======	clear screen mov	ax,	0600h mov	bx,	0700h mov	cx,	0 mov	dx,	0184fh int	10h ;=======	set focus mov	ax,	0200h mov	bx,	0000h mov	dx,	0000h int	10h ;=======	display on screen : Start Booting.">
+<meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
+<meta property="og:description" content="了解了 FAT12 文件系统，我们编写一个 BootLoader 程序。
+编写 boot#先上代码：
+org	0x7c00	BaseOfStackequ	0x7c00 ; Loader 程序的起始物理地址：BaseofLoader &lt;&lt; 4 &#43; OffsetOfLoader = 0x10000 BaseOfLoaderequ	0x1000 OffsetOfLoaderequ	0x00 ; 根目录占用的扇区数 ; 14 = (BPB_RootEntCnt * 32 &#43; BPB_BytesPerSec - 1) / BPB_BytesPerSec RootDirSectorsequ	14 ; 根目录的起始扇区号 ; 19 = 保留扇区数 &#43; FAT表扇区数 * FAT 表份数 SectorNumOfRootDirStartequ	19 ; FAT 表的起始扇区号 SectorNumOfFAT1Startequ	1 ; 由于文件起始簇号与数据起始簇号的差值而建立的变量 ; 17 = 根目录起始扇区号 - 2 SectorBalanceequ	17	jmp	short Label_Start nop BS_OEMName	db	&#39;MINEboot&#39; BPB_BytesPerSec	dw	512 BPB_SecPerClus	db	1 BPB_RsvdSecCnt	dw	1 BPB_NumFATs	db	2 BPB_RootEntCnt	dw	224 BPB_TotSec16	dw	2880 BPB_Media	db	0xf0 BPB_FATSz16	dw	9 BPB_SecPerTrk	dw	18 BPB_NumHeads	dw	2 BPB_HiddSec	dd	0 BPB_TotSec32	dd	0 BS_DrvNum	db	0 BS_Reserved1	db	0 BS_BootSig	db	0x29 BS_VolID	dd	0 BS_VolLab	db	&#39;boot loader&#39; BS_FileSysType	db	&#39;FAT12 &#39; Label_Start: mov	ax,	cs mov	ds,	ax mov	es,	ax mov	ss,	ax mov	sp,	BaseOfStack ;=======	clear screen mov	ax,	0600h mov	bx,	0700h mov	cx,	0 mov	dx,	0184fh int	10h ;=======	set focus mov	ax,	0200h mov	bx,	0000h mov	dx,	0000h int	10h ;=======	display on screen : Start Booting." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://os-dev.incolore.net/docs/2.3-bootloader-%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/" />
+
+<title>2.3 Boot Loader 引导程序 | 操作系统开发</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/book.min.134b70e5316650a530cb42e4e8630b2a01d532bebfc0337028211175336e4806.css" integrity="sha256-E0tw5TFmUKUwy0Lk6GMLKgHVMr6/wDNwKCERdTNuSAY=">
+<script defer src="/en.search.min.7302a9179b1084d68c9328108c097b2d672ec8a8e426ad431cd96f98ded4217a.js" integrity="sha256-cwKpF5sQhNaMkygQjAl7LWcuyKjkJq1DHNlvmN7UIXo="></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body dir=>
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/"><span>操作系统开发</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li>1. 开发环境搭建
+<ul>
+<li><a href="/docs/1.1-virtualbox-%E7%9A%84%E5%AE%89%E8%A3%85/">1.1 VirtualBox 的安装</a></li>
+<li><a href="/docs/1.2-%E5%9C%A8-virtualbox-%E5%AE%89%E8%A3%85-ubuntu-%E7%B3%BB%E7%BB%9F/">1.2 在 VirtualBox 安装 Ubuntu 系统</a></li>
+<li><a href="/docs/1.3-%E4%B8%BA-ubuntu-%E8%A7%A3%E9%99%A4%E7%BD%91%E7%BB%9C%E5%B0%81%E9%94%81/">1.3 为 Ubuntu 解除网络封锁</a></li>
+<li><a href="/docs/1.4-%E4%B8%BA-ubuntu-%E5%AE%89%E8%A3%85%E5%A2%9E%E5%BC%BA%E5%8A%9F%E8%83%BD/">1.4 为 Ubuntu 安装增强功能</a></li>
+<li><a href="/docs/1.5-%E4%B8%BA-ubuntu-%E9%85%8D%E7%BD%AE-ssh-%E8%BF%9E%E6%8E%A5%E5%B9%B6%E5%AF%B9%E6%8E%A5-vscode/">1.5 为 Ubuntu 配置 SSH 连接并对接 VSCode</a></li>
+<li><a href="/docs/1.6-%E5%9C%A8-ubuntu-%E4%B8%AD%E5%AE%89%E8%A3%85-bochs-%E8%99%9A%E6%8B%9F%E6%9C%BA/">1.6 在 Ubuntu 中安装 Bochs 虚拟机</a></li>
+</ul>
+</li>
+<li>2. 引导原理与引导程序
+<ul>
+<li><a href="/docs/2.1-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/">2.1 第一个引导程序</a></li>
+<li><a href="/docs/2.2-fat-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">2.2 FAT 文件系统</a></li>
+<li><a href="/docs/2.3-bootloader-%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/"class=active>2.3 BootLoader 引导程序</a></li>
+</ul>
+</li>
+<li><a href="/posts/">Blog</a>
+<ul>
+<li><a href="/posts/%E4%B8%BB%E8%A6%81%E5%8F%82%E8%80%83/">主要参考</a></li>
+<li><a href="/posts/windows-%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C/">Windows 基础操作</a></li>
+<li><a href="/posts/git-%E9%80%9F%E6%88%90%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/">Git 速成入门指南</a></li>
+<li><a href="/posts/bochs-%E8%B0%83%E8%AF%95%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">Bochs 调试常用命令</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>2.3 Boot Loader 引导程序</strong>
+
+  <label for="toc-control">
+    
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#编写-boot">编写 boot</a></li>
+    <li><a href="#heading"></a></li>
+    <li><a href="#编写-loader">编写 loader</a></li>
+    <li><a href="#使用-bximage-创建软盘">使用 bximage 创建软盘</a></li>
+  </ul>
+</nav>
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><p>了解了 FAT12 文件系统，我们编写一个 BootLoader 程序。</p>
+<h2 id="编写-boot">
+  编写 boot
+  <a class="anchor" href="#%e7%bc%96%e5%86%99-boot">#</a>
+</h2>
+<p>先上代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-nasm" data-lang="nasm">	<span style="color:#66d9ef">org</span>	<span style="color:#ae81ff">0x7c00</span>	
+
+<span style="color:#66d9ef">BaseOfStack</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">0x7c00</span>
+
+<span style="color:#75715e">; Loader 程序的起始物理地址：BaseofLoader &lt;&lt; 4 + OffsetOfLoader = 0x10000</span>
+<span style="color:#66d9ef">BaseOfLoader</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">0x1000</span>
+<span style="color:#66d9ef">OffsetOfLoader</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">0x00</span>
+
+<span style="color:#75715e">; 根目录占用的扇区数</span>
+<span style="color:#75715e">; 14 = (BPB_RootEntCnt * 32 + BPB_BytesPerSec - 1) / BPB_BytesPerSec</span>
+<span style="color:#66d9ef">RootDirSectors</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">14</span>
+<span style="color:#75715e">; 根目录的起始扇区号</span>
+<span style="color:#75715e">; 19 = 保留扇区数 + FAT表扇区数 * FAT 表份数</span>
+<span style="color:#66d9ef">SectorNumOfRootDirStart</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">19</span>
+<span style="color:#75715e">; FAT 表的起始扇区号</span>
+<span style="color:#66d9ef">SectorNumOfFAT1Start</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">1</span>
+<span style="color:#75715e">; 由于文件起始簇号与数据起始簇号的差值而建立的变量</span>
+<span style="color:#75715e">; 17 = 根目录起始扇区号 - 2</span>
+<span style="color:#66d9ef">SectorBalance</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">17</span>	
+
+	<span style="color:#a6e22e">jmp</span>	short Label_Start
+	<span style="color:#a6e22e">nop</span>
+	<span style="color:#a6e22e">BS_OEMName</span>	db	<span style="color:#e6db74">&#39;MINEboot&#39;</span>
+	<span style="color:#a6e22e">BPB_BytesPerSec</span>	dw	<span style="color:#ae81ff">512</span>
+	<span style="color:#a6e22e">BPB_SecPerClus</span>	db	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">BPB_RsvdSecCnt</span>	dw	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">BPB_NumFATs</span>	db	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">BPB_RootEntCnt</span>	dw	<span style="color:#ae81ff">224</span>
+	<span style="color:#a6e22e">BPB_TotSec16</span>	dw	<span style="color:#ae81ff">2880</span>
+	<span style="color:#a6e22e">BPB_Media</span>	db	<span style="color:#ae81ff">0xf0</span>
+	<span style="color:#a6e22e">BPB_FATSz16</span>	dw	<span style="color:#ae81ff">9</span>
+	<span style="color:#a6e22e">BPB_SecPerTrk</span>	dw	<span style="color:#ae81ff">18</span>
+	<span style="color:#a6e22e">BPB_NumHeads</span>	dw	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">BPB_HiddSec</span>	dd	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">BPB_TotSec32</span>	dd	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">BS_DrvNum</span>	db	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">BS_Reserved1</span>	db	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">BS_BootSig</span>	db	<span style="color:#ae81ff">0x29</span>
+	<span style="color:#a6e22e">BS_VolID</span>	dd	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">BS_VolLab</span>	db	<span style="color:#e6db74">&#39;boot loader&#39;</span>
+	<span style="color:#a6e22e">BS_FileSysType</span>	db	<span style="color:#e6db74">&#39;FAT12   &#39;</span>
+
+Label_Start:
+
+	<span style="color:#a6e22e">mov</span>	ax,	cs
+	<span style="color:#a6e22e">mov</span>	ds,	ax
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	ss,	ax
+	<span style="color:#a6e22e">mov</span>	sp,	BaseOfStack
+
+<span style="color:#75715e">;=======	clear screen</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">0600h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">0700h</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0184fh</span>
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+<span style="color:#75715e">;=======	set focus</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">0200h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">0000h</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0000h</span>
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+<span style="color:#75715e">;=======	display on screen : Start Booting......</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">000fh</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0000h</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">10</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	StartBootMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+<span style="color:#75715e">;=======	reset floppy</span>
+
+	<span style="color:#a6e22e">xor</span>	ah,	ah
+	<span style="color:#a6e22e">xor</span>	dl,	dl
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">13h</span>
+
+<span style="color:#75715e">;=======	search loader.bin</span>
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">word</span>	[SectorNo],	SectorNumOfRootDirStart
+
+Lable_Search_In_Root_Dir_Begin:
+
+	<span style="color:#a6e22e">cmp</span>	<span style="color:#66d9ef">word</span>	[RootDirSizeForLoop],	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">jz</span>	Label_No_LoaderBin
+	<span style="color:#a6e22e">dec</span>	<span style="color:#66d9ef">word</span>	[RootDirSizeForLoop]	
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">00h</span>
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">8000h</span>
+	<span style="color:#a6e22e">mov</span>	ax,	[SectorNo]
+	<span style="color:#a6e22e">mov</span>	cl,	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">call</span>	Func_ReadOneSector
+	<span style="color:#a6e22e">mov</span>	si,	LoaderFileName
+	<span style="color:#a6e22e">mov</span>	di,	<span style="color:#ae81ff">8000h</span>
+	<span style="color:#a6e22e">cld</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">10h</span>
+	
+Label_Search_For_LoaderBin:
+
+	<span style="color:#a6e22e">cmp</span>	dx,	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">jz</span>	Label_Goto_Next_Sector_In_Root_Dir
+	<span style="color:#a6e22e">dec</span>	dx
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">11</span>
+
+Label_Cmp_FileName:
+
+	<span style="color:#a6e22e">cmp</span>	cx,	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">jz</span>	Label_FileName_Found
+	<span style="color:#a6e22e">dec</span>	cx
+	<span style="color:#a6e22e">lodsb</span>	
+	<span style="color:#a6e22e">cmp</span>	al,	<span style="color:#66d9ef">byte</span>	[es:di]
+	<span style="color:#a6e22e">jz</span>	Label_Go_On
+	<span style="color:#a6e22e">jmp</span>	Label_Different
+
+Label_Go_On:
+	
+	<span style="color:#a6e22e">inc</span>	di
+	<span style="color:#a6e22e">jmp</span>	Label_Cmp_FileName
+
+Label_Different:
+
+	<span style="color:#a6e22e">and</span>	di,	<span style="color:#ae81ff">0ffe0h</span>
+	<span style="color:#a6e22e">add</span>	di,	<span style="color:#ae81ff">20h</span>
+	<span style="color:#a6e22e">mov</span>	si,	LoaderFileName
+	<span style="color:#a6e22e">jmp</span>	Label_Search_For_LoaderBin
+
+Label_Goto_Next_Sector_In_Root_Dir:
+	
+	<span style="color:#a6e22e">add</span>	<span style="color:#66d9ef">word</span>	[SectorNo],	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">jmp</span>	Lable_Search_In_Root_Dir_Begin
+	
+<span style="color:#75715e">;=======	display on screen : ERROR:No LOADER Found</span>
+<span style="color:#75715e">; 当找不到 loader.bin 文件时，使用 int 10h 显示错误消息</span>
+Label_No_LoaderBin:
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">008ch</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0100h</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">21</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	NoLoaderMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+	<span style="color:#a6e22e">jmp</span>	<span style="color:#66d9ef">$</span>
+
+<span style="color:#75715e">;=======	found loader.bin name in root director struct</span>
+<span style="color:#75715e">; 在根目录搜索 loader.bin 文件</span>
+Label_FileName_Found:
+
+	<span style="color:#a6e22e">mov</span>	ax,	RootDirSectors
+	<span style="color:#a6e22e">and</span>	di,	<span style="color:#ae81ff">0ffe0h</span>
+	<span style="color:#a6e22e">add</span>	di,	<span style="color:#ae81ff">01ah</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#66d9ef">word</span>	[es:di]
+	<span style="color:#a6e22e">push</span>	cx
+	<span style="color:#a6e22e">add</span>	cx,	ax
+	<span style="color:#a6e22e">add</span>	cx,	SectorBalance
+	<span style="color:#a6e22e">mov</span>	ax,	BaseOfLoader
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	bx,	OffsetOfLoader
+	<span style="color:#a6e22e">mov</span>	ax,	cx
+
+Label_Go_On_Loading_File:
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">push</span>	bx
+	<span style="color:#a6e22e">mov</span>	ah,	<span style="color:#ae81ff">0eh</span>
+	<span style="color:#a6e22e">mov</span>	al,	<span style="color:#e6db74">&#39;.&#39;</span>
+	<span style="color:#a6e22e">mov</span>	bl,	<span style="color:#ae81ff">0fh</span>
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+	<span style="color:#a6e22e">pop</span>	bx
+	<span style="color:#a6e22e">pop</span>	ax
+
+	<span style="color:#a6e22e">mov</span>	cl,	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">call</span>	Func_ReadOneSector
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">call</span>	Func_GetFATEntry
+	<span style="color:#a6e22e">cmp</span>	ax,	<span style="color:#ae81ff">0fffh</span>
+	<span style="color:#a6e22e">jz</span>	Label_File_Loaded
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	dx,	RootDirSectors
+	<span style="color:#a6e22e">add</span>	ax,	dx
+	<span style="color:#a6e22e">add</span>	ax,	SectorBalance
+	<span style="color:#a6e22e">add</span>	bx,	[BPB_BytesPerSec]
+	<span style="color:#a6e22e">jmp</span>	Label_Go_On_Loading_File
+
+Label_File_Loaded:
+	
+	<span style="color:#a6e22e">jmp</span>	BaseOfLoader:OffsetOfLoader
+
+<span style="color:#75715e">;=======	read one sector from floppy</span>
+<span style="color:#75715e">; 使用 int 13h, ah=02h，实现软盘扇区的读取</span>
+<span style="color:#75715e">; 参数：</span>
+<span style="color:#75715e">;  1. ax: 要读取的磁盘起始扇区号</span>
+<span style="color:#75715e">;  2. cl: 读入的扇区数量</span>
+<span style="color:#75715e">;  3. es:bx: 目标缓冲区起始地址</span>
+Func_ReadOneSector:
+	
+	<span style="color:#a6e22e">push</span>	bp
+	<span style="color:#a6e22e">mov</span>	bp,	sp
+	<span style="color:#a6e22e">sub</span>	esp,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">byte</span>	[bp <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>],	cl
+	<span style="color:#a6e22e">push</span>	bx
+	<span style="color:#a6e22e">mov</span>	bl,	[BPB_SecPerTrk]
+	<span style="color:#a6e22e">div</span>	bl          <span style="color:#75715e">; LBA 格式转换为 CHS 格式</span>
+	<span style="color:#a6e22e">inc</span>	ah
+	<span style="color:#a6e22e">mov</span>	cl,	ah
+	<span style="color:#a6e22e">mov</span>	dh,	al
+	<span style="color:#a6e22e">shr</span>	al,	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">mov</span>	ch,	al
+	<span style="color:#a6e22e">and</span>	dh,	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">pop</span>	bx
+	<span style="color:#a6e22e">mov</span>	dl,	[BS_DrvNum]
+Label_Go_On_Reading:
+	<span style="color:#a6e22e">mov</span>	ah,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">mov</span>	al,	<span style="color:#66d9ef">byte</span>	[bp <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>]
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">13h</span>
+	<span style="color:#a6e22e">jc</span>	Label_Go_On_Reading
+	<span style="color:#a6e22e">add</span>	esp,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">pop</span>	bp
+	<span style="color:#a6e22e">ret</span>
+
+<span style="color:#75715e">;=======	get FAT Entry</span>
+<span style="color:#75715e">; 解析 FAT 表项</span>
+<span style="color:#75715e">; 参数：</span>
+<span style="color:#75715e">;   ah: FAT 表项编号</span>
+Func_GetFATEntry:
+
+	<span style="color:#a6e22e">push</span>	es
+	<span style="color:#a6e22e">push</span>	bx
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">00</span>
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">byte</span>	[Odd],	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">3</span>
+	<span style="color:#a6e22e">mul</span>	bx
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">div</span>	bx
+	<span style="color:#a6e22e">cmp</span>	dx,	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">jz</span>	Label_Even
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">byte</span>	[Odd],	<span style="color:#ae81ff">1</span>
+
+Label_Even:
+
+	<span style="color:#a6e22e">xor</span>	dx,	dx
+	<span style="color:#a6e22e">mov</span>	bx,	[BPB_BytesPerSec]
+	<span style="color:#a6e22e">div</span>	bx
+	<span style="color:#a6e22e">push</span>	dx
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">8000h</span>
+	<span style="color:#a6e22e">add</span>	ax,	SectorNumOfFAT1Start
+	<span style="color:#a6e22e">mov</span>	cl,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">call</span>	Func_ReadOneSector
+	
+	<span style="color:#a6e22e">pop</span>	dx
+	<span style="color:#a6e22e">add</span>	bx,	dx
+	<span style="color:#a6e22e">mov</span>	ax,	[es:bx]
+	<span style="color:#a6e22e">cmp</span>	<span style="color:#66d9ef">byte</span>	[Odd],	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">jnz</span>	Label_Even_2
+	<span style="color:#a6e22e">shr</span>	ax,	<span style="color:#ae81ff">4</span>
+
+Label_Even_2:
+	<span style="color:#a6e22e">and</span>	ax,	<span style="color:#ae81ff">0fffh</span>
+	<span style="color:#a6e22e">pop</span>	bx
+	<span style="color:#a6e22e">pop</span>	es
+	<span style="color:#a6e22e">ret</span>
+
+<span style="color:#75715e">;=======	tmp variable</span>
+
+<span style="color:#a6e22e">RootDirSizeForLoop</span>	dw	RootDirSectors
+<span style="color:#a6e22e">SectorNo</span>		dw	<span style="color:#ae81ff">0</span>
+<span style="color:#a6e22e">Odd</span>			db	<span style="color:#ae81ff">0</span>
+
+<span style="color:#75715e">;=======	display messages</span>
+
+StartBootMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Start Boot&#34;</span>
+NoLoaderMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;ERROR:No LOADER Found&#34;</span>
+LoaderFileName:		<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;LOADER  BIN&#34;</span>,<span style="color:#ae81ff">0</span>
+
+<span style="color:#75715e">;=======	fill zero until whole sector</span>
+
+	<span style="color:#66d9ef">times</span>	<span style="color:#ae81ff">510</span> <span style="color:#f92672">-</span> (<span style="color:#66d9ef">$</span> <span style="color:#f92672">-</span> <span style="color:#66d9ef">$$</span>)	db	<span style="color:#ae81ff">0</span>
+	<span style="color:#66d9ef">dw</span>	<span style="color:#ae81ff">0xaa55</span>
+</code></pre></div><p>如果有看不懂的地方，就暂时跳过了，等后面学习了汇编语言，会更好理解。保存为 <code>boot.asm</code>。</p>
+<p>执行如下指令，编译：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ nasm boot.asm -o boot.bin
+</code></pre></div><h2 id="heading">
+  
+  <a class="anchor" href="#heading">#</a>
+</h2>
+<h2 id="编写-loader">
+  编写 loader
+  <a class="anchor" href="#%e7%bc%96%e5%86%99-loader">#</a>
+</h2>
+<p>在 <code>boot.nasm</code> 中，有这样一行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-nasm" data-lang="nasm">Label_File_Loaded:
+	
+	<span style="color:#a6e22e">jmp</span>	BaseOfLoader:OffsetOfLoader
+</code></pre></div><p>这里，CPU 跳转到 loader 的内存位置执行。而 loader 的代码如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-nasm" data-lang="nasm"><span style="color:#66d9ef">org</span>	<span style="color:#ae81ff">10000h</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	cs
+	<span style="color:#a6e22e">mov</span>	ds,	ax
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">0x00</span>
+	<span style="color:#a6e22e">mov</span>	ss,	ax
+	<span style="color:#a6e22e">mov</span>	sp,	<span style="color:#ae81ff">0x7c00</span>
+
+<span style="color:#75715e">;=======	display on screen : Start Loader......</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">000fh</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0200h</span>		<span style="color:#75715e">;row 2</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">12</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	StartLoaderMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+	<span style="color:#a6e22e">jmp</span>	<span style="color:#66d9ef">$</span>
+
+<span style="color:#75715e">;=======	display messages</span>
+
+StartLoaderMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Start Loader&#34;</span>
+
+</code></pre></div><p>将其保存为 <code>loader.asm</code>，执行如下指令，编译：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ nasm loader.asm -o loader.bin
+</code></pre></div><h2 id="使用-bximage-创建软盘">
+  使用 bximage 创建软盘
+  <a class="anchor" href="#%e4%bd%bf%e7%94%a8-bximage-%e5%88%9b%e5%bb%ba%e8%bd%af%e7%9b%98">#</a>
+</h2>
+<p>我们不能直接用 dd 指令写入，否则会出现个问题：磁盘大小空间不够。所以先用 <code>bximage</code> 指令创建一个软盘。</p>
+<pre><code>========================================================================
+                                bximage
+  Disk Image Creation / Conversion / Resize and Commit Tool for Bochs
+         $Id: bximage.cc 13481 2018-03-30 21:04:04Z vruppert $
+========================================================================
+
+1. Create new floppy or hard disk image
+2. Convert hard disk image to other format (mode)
+3. Resize hard disk image
+4. Commit 'undoable' redolog to base image
+5. Disk image info
+
+0. Quit
+
+Please choose one [0] 1
+
+Create image
+
+Do you want to create a floppy disk image or a hard disk image?
+Please type hd or fd. [hd] fd
+
+
+Choose the size of floppy disk image to create.
+Please type 160k, 180k, 320k, 360k, 720k, 1.2M, 1.44M, 1.68M, 1.72M, or 2.88M.
+ [1.44M] 
+
+What should be the name of the image?
+[a.img] boot.img
+
+The disk image 'boot.img' already exists.  Are you sure you want to replace it?
+Please type yes or no. [no] yes
+
+Creating floppy image 'boot.img' with 2880 sectors
+
+The following line should appear in your bochsrc:
+  floppya: image=&quot;boot.img&quot;, status=inserted
+
+</code></pre><p>执行如下指令将 <code>boot.bin</code> 写入镜像文件的前 512 字节：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>boot.bin of<span style="color:#f92672">=</span>./boot.img bs<span style="color:#f92672">=</span><span style="color:#ae81ff">512</span> count<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> conv<span style="color:#f92672">=</span>notrunc 
+1+0 records in
+1+0 records out
+<span style="color:#ae81ff">512</span> bytes copied, 0.000660162 s, <span style="color:#ae81ff">776</span> kB/s
+</code></pre></div><p>生成的 <code>boot.img</code> 实际上包含了一个文件系统。</p>
+<p>执行如下指令，创建挂载这个文件系统的文件夹：</p>
+<pre><code>$ sudo mkdir /media/mysys
+</code></pre><p>执行如下指令，把 <code>boot.img</code> 挂载到这个文件夹：</p>
+<pre><code>$ sudo mount boot.img /media/mysys/ -t vfat -o loop
+</code></pre><p>之后，在这个目录就可以间接访问到我们的 <code>boot.img</code> 文件系统。</p>
+<p>把 <code>loader.bin</code> 通过 <code>cp</code> 指令复制进去：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ sudo cp loader.bin /media/mysys/
+</code></pre></div><p>![](A:\Project\osdev\blog\os-dev\web\content\docs\2.3 BootLoader 引导程序.assets\20210315204321.png)</p>
+<p>执行 <code>bochs</code> 可以看到我们的系统启动了，并且读取了 <code>loader.bin</code>：</p>
+<p>![](A:\Project\osdev\blog\os-dev\web\content\docs\2.3 BootLoader 引导程序.assets\20210315204415.png)</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#编写-boot">编写 boot</a></li>
+    <li><a href="#heading"></a></li>
+    <li><a href="#编写-loader">编写 loader</a></li>
+    <li><a href="#使用-bximage-创建软盘">使用 bximage 创建软盘</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
