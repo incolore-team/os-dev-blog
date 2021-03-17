@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en" dir=>
+
+<head>
+  <meta name="generator" content="Hugo 0.80.0" />
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="2.4 完善 Loader 加载程序#废话不说，先上代码：
+fat12.inc 文件：
+RootDirSectorsequ	14 SectorNumOfRootDirStartequ	25 SectorNumOfFAT1Startequ	1 BS_OEMName	db	&#39;MINEboot&#39; BPB_BytesPerSec	dw	0x200 BPB_SecPerClus	db	0x8 BPB_RsvdSecCnt	dw	0x1 BPB_NumFATs	db	0x2 BPB_RootEntCnt	dw	0xe0 BPB_TotSec16	dw	0x7d82 BPB_Media	db	0xf0 BPB_FATSz16	dw	0xc BPB_SecPerTrk	dw	0x3f BPB_NumHeads	dw	0xff BPB_hiddSec	dd	0 BPB_TotSec32	dd	0 BS_DrvNum	db	0 BS_Reserved1	db	0 BS_BootSig	db	29h BS_VolID	dd	0 BS_VolLab	db	&#39;boot loader&#39; BS_FileSysType	db	&#39;FAT12 &#39; loader.">
+<meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
+<meta property="og:description" content="2.4 完善 Loader 加载程序#废话不说，先上代码：
+fat12.inc 文件：
+RootDirSectorsequ	14 SectorNumOfRootDirStartequ	25 SectorNumOfFAT1Startequ	1 BS_OEMName	db	&#39;MINEboot&#39; BPB_BytesPerSec	dw	0x200 BPB_SecPerClus	db	0x8 BPB_RsvdSecCnt	dw	0x1 BPB_NumFATs	db	0x2 BPB_RootEntCnt	dw	0xe0 BPB_TotSec16	dw	0x7d82 BPB_Media	db	0xf0 BPB_FATSz16	dw	0xc BPB_SecPerTrk	dw	0x3f BPB_NumHeads	dw	0xff BPB_hiddSec	dd	0 BPB_TotSec32	dd	0 BS_DrvNum	db	0 BS_Reserved1	db	0 BS_BootSig	db	29h BS_VolID	dd	0 BS_VolLab	db	&#39;boot loader&#39; BS_FileSysType	db	&#39;FAT12 &#39; loader." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://os-dev.incolore.net/docs/2.4-%E5%AE%8C%E5%96%84-loader-%E5%8A%A0%E8%BD%BD%E7%A8%8B%E5%BA%8F/" />
+
+<title>2.4 完善 Loader 加载程序 | 操作系统开发</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/book.min.134b70e5316650a530cb42e4e8630b2a01d532bebfc0337028211175336e4806.css" integrity="sha256-E0tw5TFmUKUwy0Lk6GMLKgHVMr6/wDNwKCERdTNuSAY=">
+<script defer src="/en.search.min.977babba9732381cbfca8180f76903a246029d71430b33f2f00226b05df4ed21.js" integrity="sha256-l3urupcyOBy/yoGA92kDokYCnXFDCzPy8AImsF307SE="></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body dir=>
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/"><span>操作系统开发</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li>1. 开发环境搭建
+<ul>
+<li><a href="/docs/1.1-virtualbox-%E7%9A%84%E5%AE%89%E8%A3%85/">1.1 VirtualBox 的安装</a></li>
+<li><a href="/docs/1.2-%E5%9C%A8-virtualbox-%E5%AE%89%E8%A3%85-ubuntu-%E7%B3%BB%E7%BB%9F/">1.2 在 VirtualBox 安装 Ubuntu 系统</a></li>
+<li><a href="/docs/1.3-%E4%B8%BA-ubuntu-%E8%A7%A3%E9%99%A4%E7%BD%91%E7%BB%9C%E5%B0%81%E9%94%81/">1.3 为 Ubuntu 解除网络封锁</a></li>
+<li><a href="/docs/1.4-%E4%B8%BA-ubuntu-%E5%AE%89%E8%A3%85%E5%A2%9E%E5%BC%BA%E5%8A%9F%E8%83%BD/">1.4 为 Ubuntu 安装增强功能</a></li>
+<li><a href="/docs/1.5-%E4%B8%BA-ubuntu-%E9%85%8D%E7%BD%AE-ssh-%E8%BF%9E%E6%8E%A5%E5%B9%B6%E5%AF%B9%E6%8E%A5-vscode/">1.5 为 Ubuntu 配置 SSH 连接并对接 VSCode</a></li>
+<li><a href="/docs/1.6-%E5%9C%A8-ubuntu-%E4%B8%AD%E5%AE%89%E8%A3%85-bochs-%E8%99%9A%E6%8B%9F%E6%9C%BA/">1.6 在 Ubuntu 中安装 Bochs 虚拟机</a></li>
+</ul>
+</li>
+<li>2. 引导原理与引导程序
+<ul>
+<li><a href="/docs/2.1-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/">2.1 第一个引导程序</a></li>
+<li><a href="/docs/2.2-fat-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">2.2 FAT 文件系统</a></li>
+<li><a href="/docs/2.3-bootloader-%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F/">2.3 BootLoader 引导程序</a></li>
+</ul>
+</li>
+<li><a href="/posts/">Blog</a>
+<ul>
+<li><a href="/posts/%E4%B8%BB%E8%A6%81%E5%8F%82%E8%80%83/">主要参考</a></li>
+<li><a href="/posts/windows-%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C/">Windows 基础操作</a></li>
+<li><a href="/posts/git-%E9%80%9F%E6%88%90%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/">Git 速成入门指南</a></li>
+<li><a href="/posts/bochs-%E8%B0%83%E8%AF%95%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">Bochs 调试常用命令</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>2.4 完善 Loader 加载程序</strong>
+
+  <label for="toc-control">
+    
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#从实模式进入保护模式">从实模式进入保护模式</a>
+      <ul>
+        <li><a href="#切换到保护模式的条件">切换到保护模式的条件</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="24-完善-loader-加载程序">
+  2.4 完善 Loader 加载程序
+  <a class="anchor" href="#24-%e5%ae%8c%e5%96%84-loader-%e5%8a%a0%e8%bd%bd%e7%a8%8b%e5%ba%8f">#</a>
+</h1>
+<p>废话不说，先上代码：</p>
+<p><code>fat12.inc</code> 文件：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-nasm" data-lang="nasm">
+<span style="color:#66d9ef">RootDirSectors</span><span style="color:#66d9ef">			equ</span>	<span style="color:#ae81ff">14</span>
+<span style="color:#66d9ef">SectorNumOfRootDirStart</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">25</span>
+<span style="color:#66d9ef">SectorNumOfFAT1Start</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">1</span>
+
+	<span style="color:#a6e22e">BS_OEMName</span>	db	<span style="color:#e6db74">&#39;MINEboot&#39;</span>
+	<span style="color:#a6e22e">BPB_BytesPerSec</span>	dw	<span style="color:#ae81ff">0x200</span>
+	<span style="color:#a6e22e">BPB_SecPerClus</span>	db	<span style="color:#ae81ff">0x8</span>
+	<span style="color:#a6e22e">BPB_RsvdSecCnt</span>	dw	<span style="color:#ae81ff">0x1</span>
+	<span style="color:#a6e22e">BPB_NumFATs</span>	db	<span style="color:#ae81ff">0x2</span>
+	<span style="color:#a6e22e">BPB_RootEntCnt</span>	dw	<span style="color:#ae81ff">0xe0</span>
+	<span style="color:#a6e22e">BPB_TotSec16</span>	dw	<span style="color:#ae81ff">0x7d82</span>
+	<span style="color:#a6e22e">BPB_Media</span>	db	<span style="color:#ae81ff">0xf0</span>
+	<span style="color:#a6e22e">BPB_FATSz16</span>	dw	<span style="color:#ae81ff">0xc</span>
+	<span style="color:#a6e22e">BPB_SecPerTrk</span>	dw	<span style="color:#ae81ff">0x3f</span>
+	<span style="color:#a6e22e">BPB_NumHeads</span>	dw	<span style="color:#ae81ff">0xff</span>
+	<span style="color:#a6e22e">BPB_hiddSec</span>	dd	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">BPB_TotSec32</span>	dd	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">BS_DrvNum</span>	db	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">BS_Reserved1</span>	db	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">BS_BootSig</span>	db	<span style="color:#ae81ff">29h</span>
+	<span style="color:#a6e22e">BS_VolID</span>	dd	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">BS_VolLab</span>	db	<span style="color:#e6db74">&#39;boot loader&#39;</span>
+	<span style="color:#a6e22e">BS_FileSysType</span>	db	<span style="color:#e6db74">&#39;FAT12   &#39;</span>
+</code></pre></div><p><code>loader.asm</code> 文件：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-nasm" data-lang="nasm"><span style="color:#66d9ef">org</span>	<span style="color:#ae81ff">10000h</span>
+	<span style="color:#a6e22e">jmp</span>	Label_Start
+
+<span style="color:#75715e">; 引入 fat12.inc</span>
+<span style="color:#75715e">%include	&#34;fat12.inc&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">; 内核程序的起始地址在 0x100000，也即 1MB 之后。</span>
+<span style="color:#75715e">; 1 MB 之内的空间不完全可用，所以被绕过。</span>
+<span style="color:#66d9ef">BaseOfKernelFile</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">0x00</span>
+<span style="color:#66d9ef">OffsetOfKernelFile</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">0x100000</span>
+
+<span style="color:#75715e">; 0x7E00 是临时转存空间。BIOS 在是模式只支持 1MB 内的物理地址寻址，所以先转存于此。</span>
+<span style="color:#66d9ef">BaseTmpOfKernelAddr</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">0x00</span>
+<span style="color:#66d9ef">OffsetTmpOfKernelFile</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">0x7E00</span>
+
+<span style="color:#66d9ef">MemoryStructBufferAddr</span><span style="color:#66d9ef">	equ</span>	<span style="color:#ae81ff">0x7E00</span>
+
+<span style="color:#960050;background-color:#1e0010">[</span><span style="color:#66d9ef">SECTION</span> gdt]
+
+LABEL_GDT:		<span style="color:#66d9ef">dd</span>	<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">0</span>
+LABEL_DESC_CODE32:	<span style="color:#66d9ef">dd</span>	<span style="color:#ae81ff">0x0000FFFF</span>,<span style="color:#ae81ff">0x00CF9A00</span>
+LABEL_DESC_DATA32:	<span style="color:#66d9ef">dd</span>	<span style="color:#ae81ff">0x0000FFFF</span>,<span style="color:#ae81ff">0x00CF9200</span>
+
+<span style="color:#66d9ef">GdtLen</span><span style="color:#66d9ef">	equ</span>	<span style="color:#66d9ef">$</span> <span style="color:#f92672">-</span> LABEL_GDT
+<span style="color:#a6e22e">GdtPtr</span>	dw	GdtLen <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+	<span style="color:#66d9ef">dd</span>	LABEL_GDT
+
+<span style="color:#66d9ef">SelectorCode32</span><span style="color:#66d9ef">	equ</span>	LABEL_DESC_CODE32 <span style="color:#f92672">-</span> LABEL_GDT
+<span style="color:#66d9ef">SelectorData32</span><span style="color:#66d9ef">	equ</span>	LABEL_DESC_DATA32 <span style="color:#f92672">-</span> LABEL_GDT
+
+<span style="color:#960050;background-color:#1e0010">[</span><span style="color:#66d9ef">SECTION</span> gdt64]
+
+LABEL_GDT64:		<span style="color:#66d9ef">dq</span>	<span style="color:#ae81ff">0x0000000000000000</span>
+LABEL_DESC_CODE64:	<span style="color:#66d9ef">dq</span>	<span style="color:#ae81ff">0x0020980000000000</span>
+LABEL_DESC_DATA64:	<span style="color:#66d9ef">dq</span>	<span style="color:#ae81ff">0x0000920000000000</span>
+
+<span style="color:#66d9ef">GdtLen64</span><span style="color:#66d9ef">	equ</span>	<span style="color:#66d9ef">$</span> <span style="color:#f92672">-</span> LABEL_GDT64
+<span style="color:#a6e22e">GdtPtr64</span>	dw	GdtLen64 <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+		<span style="color:#66d9ef">dd</span>	LABEL_GDT64
+
+<span style="color:#66d9ef">SelectorCode64</span><span style="color:#66d9ef">	equ</span>	LABEL_DESC_CODE64 <span style="color:#f92672">-</span> LABEL_GDT64
+<span style="color:#66d9ef">SelectorData64</span><span style="color:#66d9ef">	equ</span>	LABEL_DESC_DATA64 <span style="color:#f92672">-</span> LABEL_GDT64
+
+<span style="color:#960050;background-color:#1e0010">[</span><span style="color:#66d9ef">SECTION</span> .s16]
+<span style="color:#75715e">; BITS 伪指令：告知 NASM 编译器目标 CPU 位数。</span>
+<span style="color:#960050;background-color:#1e0010">[</span><span style="color:#66d9ef">BITS</span> <span style="color:#ae81ff">16</span>]
+
+Label_Start:
+
+	<span style="color:#a6e22e">mov</span>	ax,	cs
+	<span style="color:#a6e22e">mov</span>	ds,	ax
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">0x00</span>
+	<span style="color:#a6e22e">mov</span>	ss,	ax
+	<span style="color:#a6e22e">mov</span>	sp,	<span style="color:#ae81ff">0x7c00</span>
+
+<span style="color:#75715e">;=======	display on screen : Start Loader......</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">000fh</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0200h</span>		<span style="color:#75715e">;row 2</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">12</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	StartLoaderMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+</code></pre></div><p>; 下面的代码用于启用 1MB 以上地址寻址功能</p>
+<blockquote>
+<p>Intel 8088 芯片具有 20 位地址总线，2^20 种地址组合。注意每种组合对应的是内存的<strong>一个字节</strong>。也就是说有 $2^{20}$ 个字节的地址，约为 1MB。</p>
+<p>8088 芯片有一个特性叫 Memory Wraparound，大概意思就是“模 1MB”，例如访问 0x10FFEF 实际上访问的是 0x00FFEF。</p>
+<p>80286 GDT 的 BASE 是 24 位，2^24 寻址能力达到 16MB。好的，问题来了，如何向下兼容？ —— 原先按照20位地址线并且使用 Memory Wraparound 功能的程序会寻址出错。IBM 给出的解决方案 (注意是 IBM) 是 A20 地址线，就像一个小开关，当运行使用 Memory Wraparound 特性的程序时，需要将 A20 Disable；当运行 80286 程序时，就将 A20 Enable (高电平)，此时就可以使用全部的 24根地址线访问内存了。</p>
+<p>; 关于 A20 功能，可以阅读：
+; <a href="https://wiki.osdev.org/A20_Line">https://wiki.osdev.org/A20_Line</a></p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-nasm" data-lang="nasm"><span style="color:#75715e">;=======	open address A20</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">in</span>	al,	<span style="color:#ae81ff">92h</span>
+	<span style="color:#a6e22e">or</span>	al,	<span style="color:#ae81ff">00000010b</span>
+	<span style="color:#a6e22e">out</span>	<span style="color:#ae81ff">92h</span>,	al
+	<span style="color:#a6e22e">pop</span>	ax
+
+	<span style="color:#a6e22e">cli</span>
+
+	<span style="color:#66d9ef">db</span>	<span style="color:#ae81ff">0x66</span>
+	<span style="color:#a6e22e">lgdt</span>	[GdtPtr]	
+
+	<span style="color:#a6e22e">mov</span>	eax,	cr0
+	<span style="color:#a6e22e">or</span>	eax,	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">mov</span>	cr0,	eax
+
+	<span style="color:#a6e22e">mov</span>	ax,	SelectorData32
+	<span style="color:#a6e22e">mov</span>	fs,	ax
+	<span style="color:#a6e22e">mov</span>	eax,	cr0
+	<span style="color:#a6e22e">and</span>	al,	<span style="color:#ae81ff">11111110b</span>
+	<span style="color:#a6e22e">mov</span>	cr0,	eax
+
+	<span style="color:#a6e22e">sti</span>
+
+<span style="color:#75715e">;=======	reset floppy</span>
+
+	<span style="color:#a6e22e">xor</span>	ah,	ah
+	<span style="color:#a6e22e">xor</span>	dl,	dl
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">13h</span>
+
+<span style="color:#75715e">;=======	search kernel.bin</span>
+<span style="color:#75715e">; 搜索 kernel.bin 文件</span>
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">word</span>	[SectorNo],	SectorNumOfRootDirStart
+
+Lable_Search_In_Root_Dir_Begin:
+
+	<span style="color:#a6e22e">cmp</span>	<span style="color:#66d9ef">word</span>	[RootDirSizeForLoop],	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">jz</span>	Label_No_LoaderBin
+	<span style="color:#a6e22e">dec</span>	<span style="color:#66d9ef">word</span>	[RootDirSizeForLoop]	
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">00h</span>
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">8000h</span>
+	<span style="color:#a6e22e">mov</span>	ax,	[SectorNo]
+	<span style="color:#a6e22e">mov</span>	cl,	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">call</span>	Func_ReadOneSector
+	<span style="color:#a6e22e">mov</span>	si,	KernelFileName
+	<span style="color:#a6e22e">mov</span>	di,	<span style="color:#ae81ff">8000h</span>
+	<span style="color:#a6e22e">cld</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">10h</span>
+	
+Label_Search_For_LoaderBin:
+
+	<span style="color:#a6e22e">cmp</span>	dx,	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">jz</span>	Label_Goto_Next_Sector_In_Root_Dir
+	<span style="color:#a6e22e">dec</span>	dx
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">11</span>
+
+Label_Cmp_FileName:
+
+	<span style="color:#a6e22e">cmp</span>	cx,	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">jz</span>	Label_FileName_Found
+	<span style="color:#a6e22e">dec</span>	cx
+	<span style="color:#a6e22e">lodsb</span>	
+	<span style="color:#a6e22e">cmp</span>	al,	<span style="color:#66d9ef">byte</span>	[es:di]
+	<span style="color:#a6e22e">jz</span>	Label_Go_On
+	<span style="color:#a6e22e">jmp</span>	Label_Different
+
+Label_Go_On:
+	
+	<span style="color:#a6e22e">inc</span>	di
+	<span style="color:#a6e22e">jmp</span>	Label_Cmp_FileName
+
+Label_Different:
+
+	<span style="color:#a6e22e">and</span>	di,	<span style="color:#ae81ff">0FFE0h</span>
+	<span style="color:#a6e22e">add</span>	di,	<span style="color:#ae81ff">20h</span>
+	<span style="color:#a6e22e">mov</span>	si,	KernelFileName
+	<span style="color:#a6e22e">jmp</span>	Label_Search_For_LoaderBin
+
+Label_Goto_Next_Sector_In_Root_Dir:
+	
+	<span style="color:#a6e22e">add</span>	<span style="color:#66d9ef">word</span>	[SectorNo],	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">jmp</span>	Lable_Search_In_Root_Dir_Begin
+	
+<span style="color:#75715e">;=======	display on screen : ERROR:No KERNEL Found</span>
+
+Label_No_LoaderBin:
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">008Ch</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0300h</span>		<span style="color:#75715e">;row 3</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">21</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	NoLoaderMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+	<span style="color:#a6e22e">jmp</span>	<span style="color:#66d9ef">$</span>
+
+<span style="color:#75715e">;=======	found kernel.bin name in root director struct</span>
+<span style="color:#75715e">; 找到了 kernel.bin 文件</span>
+Label_FileName_Found:
+	<span style="color:#a6e22e">mov</span>	ax,	RootDirSectors
+	<span style="color:#a6e22e">and</span>	di,	<span style="color:#ae81ff">0FFE0h</span>
+	<span style="color:#a6e22e">add</span>	di,	<span style="color:#ae81ff">01Ah</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#66d9ef">word</span>	[es:di]
+	<span style="color:#a6e22e">push</span>	cx
+	<span style="color:#a6e22e">add</span>	cx,	ax
+	<span style="color:#a6e22e">add</span>	cx,	SectorBalance
+	<span style="color:#a6e22e">mov</span>	eax,	BaseTmpOfKernelAddr	<span style="color:#75715e">;BaseOfKernelFile</span>
+	<span style="color:#a6e22e">mov</span>	es,	eax
+	<span style="color:#a6e22e">mov</span>	bx,	OffsetTmpOfKernelFile	<span style="color:#75715e">;OffsetOfKernelFile</span>
+	<span style="color:#a6e22e">mov</span>	ax,	cx
+
+Label_Go_On_Loading_File:
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">push</span>	bx
+	<span style="color:#a6e22e">mov</span>	ah,	<span style="color:#ae81ff">0Eh</span>
+	<span style="color:#a6e22e">mov</span>	al,	<span style="color:#e6db74">&#39;.&#39;</span>
+	<span style="color:#a6e22e">mov</span>	bl,	<span style="color:#ae81ff">0Fh</span>
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+	<span style="color:#a6e22e">pop</span>	bx
+	<span style="color:#a6e22e">pop</span>	ax
+
+	<span style="color:#a6e22e">mov</span>	cl,	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">call</span>	Func_ReadOneSector
+	<span style="color:#a6e22e">pop</span>	ax
+
+<span style="color:#75715e">;;;;;;;;;;;;;;;;;;;;;;;	</span>
+	<span style="color:#a6e22e">push</span>	cx
+	<span style="color:#a6e22e">push</span>	eax
+	<span style="color:#a6e22e">push</span>	fs
+	<span style="color:#a6e22e">push</span>	edi
+	<span style="color:#a6e22e">push</span>	ds
+	<span style="color:#a6e22e">push</span>	esi
+
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">200h</span>
+	<span style="color:#a6e22e">mov</span>	ax,	BaseOfKernelFile
+	<span style="color:#a6e22e">mov</span>	fs,	ax
+	<span style="color:#a6e22e">mov</span>	edi,	<span style="color:#66d9ef">dword</span>	[OffsetOfKernelFileCount]
+
+	<span style="color:#a6e22e">mov</span>	ax,	BaseTmpOfKernelAddr
+	<span style="color:#a6e22e">mov</span>	ds,	ax
+	<span style="color:#a6e22e">mov</span>	esi,	OffsetTmpOfKernelFile
+
+Label_Mov_Kernel:	<span style="color:#75715e">;------------------</span>
+	
+	<span style="color:#a6e22e">mov</span>	al,	<span style="color:#66d9ef">byte</span>	[ds:esi]
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">byte</span>	[fs:edi],	al
+
+	<span style="color:#a6e22e">inc</span>	esi
+	<span style="color:#a6e22e">inc</span>	edi
+
+	<span style="color:#a6e22e">loop</span>	Label_Mov_Kernel
+
+	<span style="color:#a6e22e">mov</span>	eax,	<span style="color:#ae81ff">0x1000</span>
+	<span style="color:#a6e22e">mov</span>	ds,	eax
+
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">dword</span>	[OffsetOfKernelFileCount],	edi
+
+	<span style="color:#a6e22e">pop</span>	esi
+	<span style="color:#a6e22e">pop</span>	ds
+	<span style="color:#a6e22e">pop</span>	edi
+	<span style="color:#a6e22e">pop</span>	fs
+	<span style="color:#a6e22e">pop</span>	eax
+	<span style="color:#a6e22e">pop</span>	cx
+<span style="color:#75715e">;;;;;;;;;;;;;;;;;;;;;;;	</span>
+
+	<span style="color:#a6e22e">call</span>	Func_GetFATEntry
+	<span style="color:#a6e22e">cmp</span>	ax,	<span style="color:#ae81ff">0FFFh</span>
+	<span style="color:#a6e22e">jz</span>	Label_File_Loaded
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	dx,	RootDirSectors
+	<span style="color:#a6e22e">add</span>	ax,	dx
+	<span style="color:#a6e22e">add</span>	ax,	SectorBalance
+
+	<span style="color:#a6e22e">jmp</span>	Label_Go_On_Loading_File
+
+Label_File_Loaded:
+<span style="color:#75715e">; 从0xb800 之后，是专门用于显示字符的内存空间</span>
+<span style="color:#75715e">; 每个字符占用两个字节，低字节是字符 ASC 码，高字节是颜色</span>
+	<span style="color:#a6e22e">mov</span>	ax, <span style="color:#ae81ff">0B800h</span>
+	<span style="color:#a6e22e">mov</span>	gs, ax
+	<span style="color:#a6e22e">mov</span>	ah, <span style="color:#ae81ff">0Fh</span>				<span style="color:#75715e">; 0000: 黑底    1111: 白字</span>
+	<span style="color:#a6e22e">mov</span>	al, <span style="color:#e6db74">&#39;G&#39;</span>
+	<span style="color:#a6e22e">mov</span>	[gs:((<span style="color:#ae81ff">80</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">39</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>)], ax	<span style="color:#75715e">; 屏幕第 0 行, 第 39 列。</span>
+<span style="color:#75715e">; 关闭驱动马达，通过向 IO 端口 03F2 写入控制命令实现。</span>
+KillMotor:
+	
+	<span style="color:#a6e22e">push</span>	dx
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">03F2h</span>
+	<span style="color:#a6e22e">mov</span>	al,	<span style="color:#ae81ff">0</span>	
+	<span style="color:#a6e22e">out</span>	dx,	al
+	<span style="color:#a6e22e">pop</span>	dx
+<span style="color:#75715e">; 获取物理地址空间信息，通过调用 int 0x15 实现</span>
+<span style="color:#75715e">;=======	get memory address size type</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">000Fh</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0400h</span>		<span style="color:#75715e">;row 4</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">24</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	StartGetMemStructMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+	<span style="color:#a6e22e">mov</span>	ebx,	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">0x00</span>
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	di,	MemoryStructBufferAddr	
+
+Label_Get_Mem_Struct:
+
+	<span style="color:#a6e22e">mov</span>	eax,	<span style="color:#ae81ff">0x0E820</span>
+	<span style="color:#a6e22e">mov</span>	ecx,	<span style="color:#ae81ff">20</span>
+	<span style="color:#a6e22e">mov</span>	edx,	<span style="color:#ae81ff">0x534D4150</span>
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">15h</span>
+	<span style="color:#a6e22e">jc</span>	Label_Get_Mem_Fail
+	<span style="color:#a6e22e">add</span>	di,	<span style="color:#ae81ff">20</span>
+
+	<span style="color:#a6e22e">cmp</span>	ebx,	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">jne</span>	Label_Get_Mem_Struct
+	<span style="color:#a6e22e">jmp</span>	Label_Get_Mem_OK
+
+Label_Get_Mem_Fail:
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">008Ch</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0500h</span>		<span style="color:#75715e">;row 5</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">23</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	GetMemStructErrMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+	<span style="color:#a6e22e">jmp</span>	<span style="color:#66d9ef">$</span>
+
+Label_Get_Mem_OK:
+	
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">000Fh</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0600h</span>		<span style="color:#75715e">;row 6</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">29</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	GetMemStructOKMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>	
+
+<span style="color:#75715e">;=======	get SVGA information</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">000Fh</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0800h</span>		<span style="color:#75715e">;row 8</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">23</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	StartGetSVGAVBEInfoMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">0x00</span>
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	di,	<span style="color:#ae81ff">0x8000</span>
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">4F00h</span>
+
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+	<span style="color:#a6e22e">cmp</span>	ax,	<span style="color:#ae81ff">004Fh</span>
+
+	<span style="color:#a6e22e">jz</span>	.KO
+	
+<span style="color:#75715e">;=======	Fail</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">008Ch</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0900h</span>		<span style="color:#75715e">;row 9</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">23</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	GetSVGAVBEInfoErrMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+	<span style="color:#a6e22e">jmp</span>	<span style="color:#66d9ef">$</span>
+
+.KO:
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">000Fh</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0A00h</span>		<span style="color:#75715e">;row 10</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">29</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	GetSVGAVBEInfoOKMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+<span style="color:#75715e">;=======	Get SVGA Mode Info</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">000Fh</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0C00h</span>		<span style="color:#75715e">;row 12</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">24</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	StartGetSVGAModeInfoMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">0x00</span>
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	si,	<span style="color:#ae81ff">0x800e</span>
+
+	<span style="color:#a6e22e">mov</span>	esi,	<span style="color:#66d9ef">dword</span>	[es:si]
+	<span style="color:#a6e22e">mov</span>	edi,	<span style="color:#ae81ff">0x8200</span>
+
+Label_SVGA_Mode_Info_Get:
+
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#66d9ef">word</span>	[es:esi]
+
+<span style="color:#75715e">;=======	display SVGA mode information</span>
+
+	<span style="color:#a6e22e">push</span>	ax
+	
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">00h</span>
+	<span style="color:#a6e22e">mov</span>	al,	ch
+	<span style="color:#a6e22e">call</span>	Label_DispAL
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">00h</span>
+	<span style="color:#a6e22e">mov</span>	al,	cl	
+	<span style="color:#a6e22e">call</span>	Label_DispAL
+	
+	<span style="color:#a6e22e">pop</span>	ax
+
+<span style="color:#75715e">;=======</span>
+	
+	<span style="color:#a6e22e">cmp</span>	cx,	<span style="color:#ae81ff">0FFFFh</span>
+	<span style="color:#a6e22e">jz</span>	Label_SVGA_Mode_Info_Finish
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">4F01h</span>
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+	<span style="color:#a6e22e">cmp</span>	ax,	<span style="color:#ae81ff">004Fh</span>
+
+	<span style="color:#a6e22e">jnz</span>	Label_SVGA_Mode_Info_FAIL	
+
+	<span style="color:#a6e22e">add</span>	esi,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">add</span>	edi,	<span style="color:#ae81ff">0x100</span>
+
+	<span style="color:#a6e22e">jmp</span>	Label_SVGA_Mode_Info_Get
+		
+Label_SVGA_Mode_Info_FAIL:
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">008Ch</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0D00h</span>		<span style="color:#75715e">;row 13</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">24</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	GetSVGAModeInfoErrMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+Label_SET_SVGA_Mode_VESA_VBE_FAIL:
+
+	<span style="color:#a6e22e">jmp</span>	<span style="color:#66d9ef">$</span>
+
+Label_SVGA_Mode_Info_Finish:
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">1301h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">000Fh</span>
+	<span style="color:#a6e22e">mov</span>	dx,	<span style="color:#ae81ff">0E00h</span>		<span style="color:#75715e">;row 14</span>
+	<span style="color:#a6e22e">mov</span>	cx,	<span style="color:#ae81ff">30</span>
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	ds
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	bp,	GetSVGAModeInfoOKMessage
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">10h</span>
+
+<span style="color:#75715e">;=======	set the SVGA mode(VESA VBE)</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">4F02h</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">4180h</span>	<span style="color:#75715e">;========================mode : 0x180 or 0x143</span>
+	<span style="color:#a6e22e">int</span> 	<span style="color:#ae81ff">10h</span>
+
+	<span style="color:#a6e22e">cmp</span>	ax,	<span style="color:#ae81ff">004Fh</span>
+	<span style="color:#a6e22e">jnz</span>	Label_SET_SVGA_Mode_VESA_VBE_FAIL
+
+<span style="color:#75715e">;=======	init IDT GDT goto protect mode </span>
+
+	<span style="color:#a6e22e">cli</span>			<span style="color:#75715e">;======close interrupt</span>
+
+	<span style="color:#66d9ef">db</span>	<span style="color:#ae81ff">0x66</span>
+	<span style="color:#a6e22e">lgdt</span>	[GdtPtr]
+
+<span style="color:#75715e">;	db	0x66</span>
+<span style="color:#75715e">;	lidt	[IDT_POINTER]</span>
+
+	<span style="color:#a6e22e">mov</span>	eax,	cr0
+	<span style="color:#a6e22e">or</span>	eax,	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">mov</span>	cr0,	eax	
+
+	<span style="color:#a6e22e">jmp</span>	<span style="color:#66d9ef">dword</span> SelectorCode32:GO_TO_TMP_Protect
+
+<span style="color:#960050;background-color:#1e0010">[</span><span style="color:#66d9ef">SECTION</span> .s32]
+<span style="color:#960050;background-color:#1e0010">[</span><span style="color:#66d9ef">BITS</span> <span style="color:#ae81ff">32</span>]
+
+GO_TO_TMP_Protect:
+
+<span style="color:#75715e">;=======	go to tmp long mode</span>
+
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">0x10</span>
+	<span style="color:#a6e22e">mov</span>	ds,	ax
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	fs,	ax
+	<span style="color:#a6e22e">mov</span>	ss,	ax
+	<span style="color:#a6e22e">mov</span>	esp,	<span style="color:#ae81ff">7E00h</span>
+
+	<span style="color:#a6e22e">call</span>	support_long_mode
+	<span style="color:#a6e22e">test</span>	eax,	eax
+
+	<span style="color:#a6e22e">jz</span>	no_support
+
+<span style="color:#75715e">;=======	init temporary page table 0x90000</span>
+
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">dword</span>	[<span style="color:#ae81ff">0x90000</span>],	<span style="color:#ae81ff">0x91007</span>
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">dword</span>	[<span style="color:#ae81ff">0x90800</span>],	<span style="color:#ae81ff">0x91007</span>		
+
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">dword</span>	[<span style="color:#ae81ff">0x91000</span>],	<span style="color:#ae81ff">0x92007</span>
+
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">dword</span>	[<span style="color:#ae81ff">0x92000</span>],	<span style="color:#ae81ff">0x000083</span>
+
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">dword</span>	[<span style="color:#ae81ff">0x92008</span>],	<span style="color:#ae81ff">0x200083</span>
+
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">dword</span>	[<span style="color:#ae81ff">0x92010</span>],	<span style="color:#ae81ff">0x400083</span>
+
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">dword</span>	[<span style="color:#ae81ff">0x92018</span>],	<span style="color:#ae81ff">0x600083</span>
+
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">dword</span>	[<span style="color:#ae81ff">0x92020</span>],	<span style="color:#ae81ff">0x800083</span>
+
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">dword</span>	[<span style="color:#ae81ff">0x92028</span>],	<span style="color:#ae81ff">0xa00083</span>
+
+<span style="color:#75715e">;=======	load GDTR</span>
+
+	<span style="color:#66d9ef">db</span>	<span style="color:#ae81ff">0x66</span>
+	<span style="color:#a6e22e">lgdt</span>	[GdtPtr64]
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">0x10</span>
+	<span style="color:#a6e22e">mov</span>	ds,	ax
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">mov</span>	fs,	ax
+	<span style="color:#a6e22e">mov</span>	gs,	ax
+	<span style="color:#a6e22e">mov</span>	ss,	ax
+
+	<span style="color:#a6e22e">mov</span>	esp,	<span style="color:#ae81ff">7E00h</span>
+
+<span style="color:#75715e">;=======	open PAE</span>
+
+	<span style="color:#a6e22e">mov</span>	eax,	cr4
+	<span style="color:#a6e22e">bts</span>	eax,	<span style="color:#ae81ff">5</span>
+	<span style="color:#a6e22e">mov</span>	cr4,	eax
+
+<span style="color:#75715e">;=======	load	cr3</span>
+
+	<span style="color:#a6e22e">mov</span>	eax,	<span style="color:#ae81ff">0x90000</span>
+	<span style="color:#a6e22e">mov</span>	cr3,	eax
+
+<span style="color:#75715e">;=======	enable long-mode</span>
+
+	<span style="color:#a6e22e">mov</span>	ecx,	<span style="color:#ae81ff">0C0000080h</span>		<span style="color:#75715e">;IA32_EFER</span>
+	<span style="color:#a6e22e">rdmsr</span>
+
+	<span style="color:#a6e22e">bts</span>	eax,	<span style="color:#ae81ff">8</span>
+	<span style="color:#a6e22e">wrmsr</span>
+
+<span style="color:#75715e">;=======	open PE and paging</span>
+
+	<span style="color:#a6e22e">mov</span>	eax,	cr0
+	<span style="color:#a6e22e">bts</span>	eax,	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">bts</span>	eax,	<span style="color:#ae81ff">31</span>
+	<span style="color:#a6e22e">mov</span>	cr0,	eax
+
+	<span style="color:#a6e22e">jmp</span>	SelectorCode64:OffsetOfKernelFile
+
+<span style="color:#75715e">;=======	test support long mode or not</span>
+
+support_long_mode:
+
+	<span style="color:#a6e22e">mov</span>	eax,	<span style="color:#ae81ff">0x80000000</span>
+	<span style="color:#66d9ef">cpu</span>id
+	<span style="color:#a6e22e">cmp</span>	eax,	<span style="color:#ae81ff">0x80000001</span>
+	<span style="color:#a6e22e">setnb</span>	al	
+	<span style="color:#a6e22e">jb</span>	support_long_mode_done
+	<span style="color:#a6e22e">mov</span>	eax,	<span style="color:#ae81ff">0x80000001</span>
+	<span style="color:#66d9ef">cpu</span>id
+	<span style="color:#a6e22e">bt</span>	edx,	<span style="color:#ae81ff">29</span>
+	<span style="color:#a6e22e">setc</span>	al
+support_long_mode_done:
+	
+	<span style="color:#a6e22e">movzx</span>	eax,	al
+	<span style="color:#a6e22e">ret</span>
+
+<span style="color:#75715e">;=======	no support</span>
+
+no_support:
+	<span style="color:#a6e22e">jmp</span>	<span style="color:#66d9ef">$</span>
+
+<span style="color:#75715e">;=======	read one sector from floppy</span>
+
+<span style="color:#960050;background-color:#1e0010">[</span><span style="color:#66d9ef">SECTION</span> .s16lib]
+<span style="color:#960050;background-color:#1e0010">[</span><span style="color:#66d9ef">BITS</span> <span style="color:#ae81ff">16</span>]
+
+Func_ReadOneSector:
+	
+	<span style="color:#a6e22e">push</span>	bp
+	<span style="color:#a6e22e">mov</span>	bp,	sp
+	<span style="color:#a6e22e">sub</span>	esp,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">byte</span>	[bp <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>],	cl
+	<span style="color:#a6e22e">push</span>	bx
+	<span style="color:#a6e22e">mov</span>	bl,	[BPB_SecPerTrk]
+	<span style="color:#a6e22e">div</span>	bl
+	<span style="color:#a6e22e">inc</span>	ah
+	<span style="color:#a6e22e">mov</span>	cl,	ah
+	<span style="color:#a6e22e">mov</span>	dh,	al
+	<span style="color:#a6e22e">shr</span>	al,	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">mov</span>	ch,	al
+	<span style="color:#a6e22e">and</span>	dh,	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">pop</span>	bx
+	<span style="color:#a6e22e">mov</span>	dl,	[BS_DrvNum]
+Label_Go_On_Reading:
+	<span style="color:#a6e22e">mov</span>	ah,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">mov</span>	al,	<span style="color:#66d9ef">byte</span>	[bp <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>]
+	<span style="color:#a6e22e">int</span>	<span style="color:#ae81ff">13h</span>
+	<span style="color:#a6e22e">jc</span>	Label_Go_On_Reading
+	<span style="color:#a6e22e">add</span>	esp,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">pop</span>	bp
+	<span style="color:#a6e22e">ret</span>
+
+<span style="color:#75715e">;=======	get FAT Entry</span>
+
+Func_GetFATEntry:
+
+	<span style="color:#a6e22e">push</span>	es
+	<span style="color:#a6e22e">push</span>	bx
+	<span style="color:#a6e22e">push</span>	ax
+	<span style="color:#a6e22e">mov</span>	ax,	<span style="color:#ae81ff">00</span>
+	<span style="color:#a6e22e">mov</span>	es,	ax
+	<span style="color:#a6e22e">pop</span>	ax
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">byte</span>	[Odd],	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">3</span>
+	<span style="color:#a6e22e">mul</span>	bx
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">div</span>	bx
+	<span style="color:#a6e22e">cmp</span>	dx,	<span style="color:#ae81ff">0</span>
+	<span style="color:#a6e22e">jz</span>	Label_Even
+	<span style="color:#a6e22e">mov</span>	<span style="color:#66d9ef">byte</span>	[Odd],	<span style="color:#ae81ff">1</span>
+
+Label_Even:
+
+	<span style="color:#a6e22e">xor</span>	dx,	dx
+	<span style="color:#a6e22e">mov</span>	bx,	[BPB_BytesPerSec]
+	<span style="color:#a6e22e">div</span>	bx
+	<span style="color:#a6e22e">push</span>	dx
+	<span style="color:#a6e22e">mov</span>	bx,	<span style="color:#ae81ff">8000h</span>
+	<span style="color:#a6e22e">add</span>	ax,	SectorNumOfFAT1Start
+	<span style="color:#a6e22e">mov</span>	cl,	<span style="color:#ae81ff">2</span>
+	<span style="color:#a6e22e">call</span>	Func_ReadOneSector
+	
+	<span style="color:#a6e22e">pop</span>	dx
+	<span style="color:#a6e22e">add</span>	bx,	dx
+	<span style="color:#a6e22e">mov</span>	ax,	[es:bx]
+	<span style="color:#a6e22e">cmp</span>	<span style="color:#66d9ef">byte</span>	[Odd],	<span style="color:#ae81ff">1</span>
+	<span style="color:#a6e22e">jnz</span>	Label_Even_2
+	<span style="color:#a6e22e">shr</span>	ax,	<span style="color:#ae81ff">4</span>
+
+Label_Even_2:
+	<span style="color:#a6e22e">and</span>	ax,	<span style="color:#ae81ff">0FFFh</span>
+	<span style="color:#a6e22e">pop</span>	bx
+	<span style="color:#a6e22e">pop</span>	es
+	<span style="color:#a6e22e">ret</span>
+
+<span style="color:#75715e">;=======	display num in al</span>
+<span style="color:#75715e">; 显示十六进制数字，AL 是要显示的数字</span>
+Label_DispAL:
+
+	<span style="color:#a6e22e">push</span>	ecx
+	<span style="color:#a6e22e">push</span>	edx
+	<span style="color:#a6e22e">push</span>	edi
+	
+	<span style="color:#a6e22e">mov</span>	edi,	[DisplayPosition]
+	<span style="color:#a6e22e">mov</span>	ah,	<span style="color:#ae81ff">0Fh</span>
+	<span style="color:#a6e22e">mov</span>	dl,	al
+	<span style="color:#a6e22e">shr</span>	al,	<span style="color:#ae81ff">4</span>
+	<span style="color:#a6e22e">mov</span>	ecx,	<span style="color:#ae81ff">2</span>
+.begin:
+
+	<span style="color:#a6e22e">and</span>	al,	<span style="color:#ae81ff">0Fh</span>
+	<span style="color:#a6e22e">cmp</span>	al,	<span style="color:#ae81ff">9</span>
+	<span style="color:#a6e22e">ja</span>	.1
+	<span style="color:#a6e22e">add</span>	al,	<span style="color:#e6db74">&#39;0&#39;</span>
+	<span style="color:#a6e22e">jmp</span>	.2
+.1:
+
+	<span style="color:#a6e22e">sub</span>	al,	<span style="color:#ae81ff">0Ah</span>
+	<span style="color:#a6e22e">add</span>	al,	<span style="color:#e6db74">&#39;A&#39;</span>
+.2:
+
+	<span style="color:#a6e22e">mov</span>	[gs:edi],	ax
+	<span style="color:#a6e22e">add</span>	edi,	<span style="color:#ae81ff">2</span>
+	
+	<span style="color:#a6e22e">mov</span>	al,	dl
+	<span style="color:#a6e22e">loop</span>	.begin
+
+	<span style="color:#a6e22e">mov</span>	[DisplayPosition],	edi
+
+	<span style="color:#a6e22e">pop</span>	edi
+	<span style="color:#a6e22e">pop</span>	edx
+	<span style="color:#a6e22e">pop</span>	ecx
+	
+	<span style="color:#a6e22e">ret</span>
+
+
+<span style="color:#75715e">;=======	tmp IDT</span>
+
+IDT:
+	<span style="color:#66d9ef">times</span>	<span style="color:#ae81ff">0x50</span>	dq	<span style="color:#ae81ff">0</span>
+IDT_END:
+
+IDT_POINTER:
+		<span style="color:#66d9ef">dw</span>	IDT_END <span style="color:#f92672">-</span> IDT <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+		<span style="color:#66d9ef">dd</span>	IDT
+
+<span style="color:#75715e">;=======	tmp variable</span>
+
+<span style="color:#a6e22e">RootDirSizeForLoop</span>	dw	RootDirSectors
+<span style="color:#a6e22e">SectorNo</span>		dw	<span style="color:#ae81ff">0</span>
+<span style="color:#a6e22e">Odd</span>			db	<span style="color:#ae81ff">0</span>
+<span style="color:#a6e22e">OffsetOfKernelFileCount</span>	dd	OffsetOfKernelFile
+
+<span style="color:#a6e22e">DisplayPosition</span>		dd	<span style="color:#ae81ff">0</span>
+
+<span style="color:#75715e">;=======	display messages</span>
+
+StartLoaderMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Start Loader&#34;</span>
+NoLoaderMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;ERROR:No KERNEL Found&#34;</span>
+KernelFileName:		<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;KERNEL  BIN&#34;</span>,<span style="color:#ae81ff">0</span>
+StartGetMemStructMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Start Get Memory Struct.&#34;</span>
+GetMemStructErrMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Get Memory Struct ERROR&#34;</span>
+GetMemStructOKMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Get Memory Struct SUCCESSFUL!&#34;</span>
+
+StartGetSVGAVBEInfoMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Start Get SVGA VBE Info&#34;</span>
+GetSVGAVBEInfoErrMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Get SVGA VBE Info ERROR&#34;</span>
+GetSVGAVBEInfoOKMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Get SVGA VBE Info SUCCESSFUL!&#34;</span>
+
+StartGetSVGAModeInfoMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Start Get SVGA Mode Info&#34;</span>
+GetSVGAModeInfoErrMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Get SVGA Mode Info ERROR&#34;</span>
+GetSVGAModeInfoOKMessage:	<span style="color:#66d9ef">db</span>	<span style="color:#e6db74">&#34;Get SVGA Mode Info SUCCESSFUL!&#34;</span>
+</code></pre></div><h2 id="从实模式进入保护模式">
+  从实模式进入保护模式
+  <a class="anchor" href="#%e4%bb%8e%e5%ae%9e%e6%a8%a1%e5%bc%8f%e8%bf%9b%e5%85%a5%e4%bf%9d%e6%8a%a4%e6%a8%a1%e5%bc%8f">#</a>
+</h2>
+<p>CPU 可以运行在实模式和保护模式。</p>
+<p>实模式可以任意修改内存，但是也因此不安全。</p>
+<p>在保护模式，处理器可以处在 0~3 四个等级状态，数字越低，级别越高，越靠近底层。</p>
+<h3 id="切换到保护模式的条件">
+  切换到保护模式的条件
+  <a class="anchor" href="#%e5%88%87%e6%8d%a2%e5%88%b0%e4%bf%9d%e6%8a%a4%e6%a8%a1%e5%bc%8f%e7%9a%84%e6%9d%a1%e4%bb%b6">#</a>
+</h3>
+<ol>
+<li>GDT，全局描述符表。</li>
+<li>IDT，中断描述符表。</li>
+<li>CR 1~4 控制寄存器。</li>
+<li>内存范围类型寄存器。</li>
+</ol>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#从实模式进入保护模式">从实模式进入保护模式</a>
+      <ul>
+        <li><a href="#切换到保护模式的条件">切换到保护模式的条件</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
